@@ -1,9 +1,5 @@
-# bch-wallet-web3-android
-This is a web-based single page app (SPA) written in React. It provides non-custodial wallet features for the Bitcoin Cash blockchain, including support for SLP tokens and NFTs. In includes [CapacitorJS](https://capacitorjs.com/) libraries and configuration so that it can be compiled into a native Android APK file.
-
-- [Live Demo on Filecoin](https://bafybeiheljff4sfsujx2kb4hna7rlotjlmgfftcwtznhzxiltojmc2nkbm.ipfs.dweb.link/)
-- [Live Demo on GitHub Pages](https://permissionless-software-foundation.github.io/bch-wallet-web3-android/)
-- [Download latest APK file](./android/apk/bch-web3-wallet.apk)
+# bch-dex-taker-ui
+This is a fork of [bch-wallet-web3-android](https://github.com/Permissionless-Software-Foundation/bch-wallet-web3-android) and is designed to replicate the graphical UI of [bch-dex-ui-v2](https://github.com/Permissionless-Software-Foundation/bch-dex-ui-v2). However, unlike that UI, this one does not need the same back-end infrastructure. This app can communicate directly with the [pay-to-write database (P2WDB)](https://p2wdb.com) to place Counter Offers and purchase tokens.
 
 ## Support
 
@@ -19,13 +15,6 @@ This open source software is developed and maintained by the [Permissionless Sof
 <p>bitcoincash:qqsrke9lh257tqen99dkyy2emh4uty0vky9y0z0lsr</p>
 </div>
 
-## For JavaScript Developers
-
-This is a fork of [react-bootstrap-web3-android](https://github.com/Permissionless-Software-Foundation/react-bootstrap-web3-android), which is a fork of [react-bootstrap-web3-spa](https://github.com/Permissionless-Software-Foundation/react-bootstrap-web3-spa). That boilerplate is used to build a React app using the [react-boostrap library](https://www.npmjs.com/package/react-bootstrap).
-
-Additional documentation:
-- [Developer Documentation](./dev-docs)
-- [Deployment Targets](./deploy)
 
 ## License
 [MIT](./LICENSE.md)

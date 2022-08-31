@@ -70,8 +70,9 @@ class App extends React.Component {
         bchUsdPrice: 150
       },
 
-      // Will be replaced by Sweep library class once the library loads.
-      Sweep: null
+      // Will be replaced by library class once the library loads.
+      Sweep: null,
+      BchDexLib: null
     }
 
     this.cnt = 0
@@ -92,6 +93,10 @@ class App extends React.Component {
       this.addToModal('Loading bch-sweep-lib')
       const Sweep = await this.asyncLoad.loadSweepLib()
       this.setState({ Sweep })
+
+      this.addToModal('Loading bch-dex-lib')
+      const BchDexLib = await this.asyncLoad.loadBchDexLib()
+      this.setState({ BchDexLib })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')

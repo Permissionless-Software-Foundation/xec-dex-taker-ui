@@ -12,6 +12,7 @@ import { DatatableWrapper, TableBody, TableHeader } from 'react-bs-datatable'
 // Local libraries
 import config from '../../config'
 import WaitingModal from '../waiting-modal'
+import VerifiedTokens from './verified'
 
 // Global variables and constants
 const SERVER = `${config.server}/`
@@ -40,8 +41,8 @@ const TABLE_HEADERS = [
     title: 'Quantity'
   },
   {
-    prop: 'rateInBaseUnit',
-    title: 'Sats Each'
+    prop: 'usdPrice',
+    title: 'Price (USD)'
   },
   {
     prop: 'button',
@@ -68,6 +69,9 @@ class Offers extends React.Component {
 
     // Bind this do event handlers
     this.handleBuy = this.handleBuy.bind(this)
+
+    // Encapsulate dependencies
+    this.verify = new VerifiedTokens()
 
     // _this = this
   }
@@ -124,6 +128,10 @@ class Offers extends React.Component {
       const thisOffer = offerRawData[i]
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
+      // Skip scam tokens that try to impersonate verified tokens.
+      const isScam = this.verify.checkTicker(thisOffer.ticker, thisOffer.tokenId)
+      if (isScam) continue
+
       // Get and format the token ID
       const tokenId = thisOffer.tokenId
       const smallTokenId = this.cutString(tokenId)
@@ -136,6 +144,18 @@ class Offers extends React.Component {
       thisOffer.button = (<Button text='Buy' variant='success' size='lg' id={p2wdbHash} onClick={this.handleBuy}>Buy</Button>)
 
       thisOffer.p2wdbHash = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
+
+      // Convert sats to BCH, and then calculate cost in USD.
+      const bchjs = this.state.appData.bchWallet.bchjs
+      const rateInSats = parseInt(thisOffer.rateInBaseUnit)
+      // console.log('rateInSats: ', rateInSats)
+      const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
+      // console.log('bchCost: ', bchCost)
+      // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
+      let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
+      usdPrice = bchjs.Util.floor2(usdPrice)
+      const priceStr = `$${usdPrice.toFixed(2)}`
+      thisOffer.usdPrice = priceStr
 
       offers.push(thisOffer)
     }

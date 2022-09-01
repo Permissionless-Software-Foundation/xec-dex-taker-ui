@@ -70,8 +70,10 @@ class App extends React.Component {
         bchUsdPrice: 150
       },
 
-      // Will be replaced by Sweep library class once the library loads.
-      Sweep: null
+      // Will be replaced by library class once the library loads.
+      Sweep: null,
+      dex: null,
+      p2wcb: null
     }
 
     this.cnt = 0
@@ -92,6 +94,14 @@ class App extends React.Component {
       this.addToModal('Loading bch-sweep-lib')
       const Sweep = await this.asyncLoad.loadSweepLib()
       this.setState({ Sweep })
+
+      this.addToModal('Loading bch-dex-lib')
+      const BchDexLib = await this.asyncLoad.loadBchDexLib()
+      this.setState({ BchDexLib })
+
+      this.addToModal('Loading p2wdb')
+      const P2WDB = await this.asyncLoad.loadP2wdbLib()
+      this.setState({ P2WDB })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')
@@ -119,11 +129,26 @@ class App extends React.Component {
       this.addToModal('Getting BCH spot price in USD')
       await this.asyncLoad.getUSDExchangeRate(bchWallet, this.updateBchWalletState)
 
+      // Instantiate the p2wdb and bch-dex-lib libraries
+      this.addToModal('Instantiating P2WDB and DEX libraries')
+      const wif = bchWallet.walletInfo.privateKey
+
+      // Instantiate p2wdb library.
+      // const P2WDBLib = this.state.appData.P2WDB
+      const p2wdbRead = new P2WDB.Read()
+      const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
+
+      // Instantiate dex library
+      // const BchDexLib = this.state.appData.BchDexLib
+      const bchDexLib = new BchDexLib({ wallet: bchWallet, p2wdbRead, p2wdbWrite })
+
       // Close the modal once initialization is done.
       this.setState({
         showStartModal: false,
         asyncInitFinished: true,
-        asyncInitSucceeded: true
+        asyncInitSucceeded: true,
+        dex: bchDexLib,
+        p2wdb: { p2wdbRead, p2wdbWrite }
       })
     } catch (err) {
       this.modalBody = [
@@ -160,7 +185,9 @@ class App extends React.Component {
 
       servers: this.state.servers, // Alternative back end servers
 
-      Sweep: this.state.Sweep // Sweep library
+      Sweep: this.state.Sweep, // Sweep library
+      dex: this.state.dex,
+      p2wdb: this.state.p2wdb
     }
 
     return (

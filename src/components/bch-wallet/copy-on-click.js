@@ -25,7 +25,8 @@ class CopyOnClick extends React.Component {
       // displayCopyMsg: false
       animationRunning: false,
       iconVis: 'visible',
-      wordVis: 'hidden'
+      wordVis: 'hidden',
+      appData: props.appData
     }
 
     // _this = this
@@ -58,10 +59,17 @@ class CopyOnClick extends React.Component {
     // Get the name of the wallet property to be copied.
     let key = event.target.nearestViewportElement.attributes.id.nodeValue
     key = key.slice(0, -5)
-    // console.log('key: ', key)
+    console.log('key: ', key)
 
-    const val = _this.state.bchWalletState[key]
-    // console.log(`value copied to clipboard: ${val}`)
+    let val = _this.state.bchWalletState[key]
+
+    if (key.includes('index1Addr')) {
+      val = _this.state.appData.index1Addr
+    } else if (key.includes('index1Wif')) {
+      val = _this.state.appData.index1Wif
+    }
+
+    console.log(`value copied to clipboard: ${val}`)
 
     try {
       // Capacitor Android environment.

@@ -146,42 +146,66 @@ class Offers extends React.Component {
   }
 
   async handleBuy (event) {
-    console.log('Buy button clicked. Event: ', event)
+    try {
+      console.log('Buy button clicked. Event: ', event)
 
-    const targetOffer = event.target.id
-    console.log('targetOffer: ', targetOffer)
+      const targetOffer = event.target.id
+      console.log('targetOffer: ', targetOffer)
 
-    // Initialize modal
-    this.setState({
-      showModal: true,
-      modalBody: ['Generating Counter Offer...', '(This can take a couple minutes)'],
-      hideSpinner: false
-    })
+      // Initialize modal
+      this.setState({
+        showModal: true,
+        modalBody: ['Generating Counter Offer...', '(This can take a couple minutes)'],
+        hideSpinner: false
+      })
 
-    const options = {
-      method: 'post',
-      url: `${SERVER}offer/take`,
-      data: {
-        offerCid: targetOffer
-      }
+      // const mnemonic = this.state.appData.bchWallet.walletInfo.mnemonic
+      const wif = this.state.appData.bchWallet.walletInfo.privateKey
+      const wallet = this.state.appData.bchWallet
+
+      // Instantiate p2wdb library.
+      const P2WDB = this.state.appData.P2WDB
+      const p2wdbRead = new P2WDB.Read()
+      const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
+
+      // console.log('done')
+
+      const BchDexLib = this.state.appData.BchDexLib
+      const bchDexLib = new BchDexLib({ wallet, p2wdbRead, p2wdbWrite })
+
+      // const options = {
+      //   method: 'post',
+      //   url: `${SERVER}offer/take`,
+      //   data: {
+      //     offerCid: targetOffer
+      //   }
+      // }
+
+      // const result = await axios.request(options)
+      // console.log('result.data: ', result.data)
+      // const p2wdbHash = result.data.hash
+
+      const p2wdbHash = await bchDexLib.take.takeOffer(targetOffer)
+
+      // Add link to output
+      const modalBody = []
+      modalBody.push('Success!')
+      modalBody.push(<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
+      modalBody.push('What happens next:')
+      modalBody.push('The money has not yet left your wallet! It is still under your control.')
+      modalBody.push('If the sellers node is online, they will accept the Counter Offer you just generated in a few minutes.')
+      modalBody.push('If the tokens never show up, you can sweep the funds back into your wallet.')
+      this.setState({
+        modalBody,
+        hideSpinner: true
+      })
+    } catch (err) {
+      this.setState({
+        showModal: true,
+        modalBody: ['Error trying to generate Counter Offer!', err.message],
+        hideSpinner: true
+      })
     }
-
-    const result = await axios.request(options)
-    // console.log('result.data: ', result.data)
-    const p2wdbHash = result.data.hash
-
-    // Add link to output
-    const modalBody = []
-    modalBody.push('Success!')
-    modalBody.push(<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
-    modalBody.push('What happens next:')
-    modalBody.push('The money has not yet left your wallet! It is still under your control.')
-    modalBody.push('If the sellers node is online, they will accept the Counter Offer you just generated in a few minutes.')
-    modalBody.push('If the tokens never show up, you can sweep the funds back into your wallet.')
-    this.setState({
-      modalBody,
-      hideSpinner: true
-    })
   }
 
   // REST request to get data from avax-dex

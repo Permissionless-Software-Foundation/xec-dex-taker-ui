@@ -72,7 +72,8 @@ class App extends React.Component {
 
       // Will be replaced by library class once the library loads.
       Sweep: null,
-      BchDexLib: null
+      BchDexLib: null,
+      P2WDB: null
     }
 
     this.cnt = 0
@@ -97,6 +98,10 @@ class App extends React.Component {
       this.addToModal('Loading bch-dex-lib')
       const BchDexLib = await this.asyncLoad.loadBchDexLib()
       this.setState({ BchDexLib })
+
+      this.addToModal('Loading p2wdb')
+      const P2WDB = await this.asyncLoad.loadP2wdbLib()
+      this.setState({ P2WDB })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')
@@ -165,7 +170,9 @@ class App extends React.Component {
 
       servers: this.state.servers, // Alternative back end servers
 
-      Sweep: this.state.Sweep // Sweep library
+      Sweep: this.state.Sweep, // Sweep library
+      BchDexLib: this.state.BchDexLib,
+      P2WDB: this.state.P2WDB
     }
 
     return (

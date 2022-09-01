@@ -27,6 +27,7 @@ class Sweep extends React.Component {
     // Bind this to event handlers
     this.handleSweep = this.handleSweep.bind(this)
     this.updateWalletState = this.updateWalletState.bind(this)
+    this.handleCancelCounterOffers = this.handleCancelCounterOffers.bind(this)
 
     // _this = this
   }
@@ -72,7 +73,30 @@ class Sweep extends React.Component {
 
           <Row style={{ textAlign: 'center' }}>
             <Col>
-              <Button variant='info' onClick={(e) => this.handleSweep()}>Sweep</Button>
+              <Button variant='info' onClick={(e) => this.handleSweep(e)}>Sweep</Button>
+            </Col>
+          </Row>
+
+          <br />
+          <br />
+          <hr />
+
+          <Row>
+            <Col>
+              <p>
+                When a Buy order is created, the coins (UTXO) to pay for it are
+                moved to a secondary address. Clicking the button below will
+                sweep those funds back into this main wallet. This will also
+                cancel/invalidate all open Counter Offers that you've created.
+              </p>
+            </Col>
+          </Row>
+
+          <Row style={{ textAlign: 'center' }}>
+            <Col>
+              <Button onClick={(e) => this.handleCancelCounterOffers(e)}>
+                Sweep DEX Trading Wallet
+              </Button>
             </Col>
           </Row>
         </Container>
@@ -84,6 +108,66 @@ class Sweep extends React.Component {
         }
       </>
     )
+  }
+
+  async handleCancelCounterOffers (event) {
+    console.log('handleCancelCounterOffers() called')
+
+    // Set the modal to its initial state.
+    this.setState({
+      showModal: true,
+      hideSpinner: false,
+      statusMsg: ''
+    })
+
+    // Get the keypair that holds Counter Offer UTXOs.
+    const bchDexLib = this.state.appData.dex
+    const keyPair = await bchDexLib.take.util.getKeyPair(1)
+    const wif = keyPair.wif
+
+    // Instantiate the sweep library.
+    const Sweep = this.state.appData.Sweep
+    const walletWif = this.state.appData.bchWallet.walletInfo.privateKey
+    // const bchjs = this.state.appData.bchWallet.bchjs
+    const toAddr = this.state.appData.bchWallet.slpAddress
+
+    // Instance the Sweep library
+    const sweep = new Sweep(wif, walletWif, this.state.appData.bchWallet)
+    await sweep.populateObjectFromNetwork()
+
+    // Constructing the sweep transaction
+    const hex = await sweep.sweepTo(toAddr)
+
+    // return transactionHex
+
+    // Broadcast the transaction to the network.
+    // const txId = await sweeperLib.blockchain.broadcast(transactionHex)
+    const txid = await this.state.appData.bchWallet.ar.sendTx(hex)
+
+    // Generate an HTML status message with links to block explorers.
+    const statusMsg = (
+      <>
+        <p>
+          Sweep succeeded!
+        </p>
+        <p>
+          Transaction ID: {txid}
+        </p>
+        <p>
+          <a href={`https://blockchair.com/bitcoin-cash/transaction/${txid}`} target='_blank' rel='noreferrer'>TX on Blockchair BCH Block Explorer</a>
+        </p>
+        <p>
+          <a href={`https://token.fullstack.cash/transactions/?txid=${txid}`} target='_blank' rel='noreferrer'>TX on token explorer</a>
+        </p>
+      </>
+    )
+
+    this.setState({
+      hideSpinner: true,
+      statusMsg
+    })
+
+    await this.updateWalletState()
   }
 
   async handleSweep (event) {

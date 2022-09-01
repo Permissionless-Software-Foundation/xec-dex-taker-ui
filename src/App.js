@@ -72,8 +72,8 @@ class App extends React.Component {
 
       // Will be replaced by library class once the library loads.
       Sweep: null,
-      BchDexLib: null,
-      P2WDB: null
+      dex: null,
+      p2wcb: null
     }
 
     this.cnt = 0
@@ -129,11 +129,26 @@ class App extends React.Component {
       this.addToModal('Getting BCH spot price in USD')
       await this.asyncLoad.getUSDExchangeRate(bchWallet, this.updateBchWalletState)
 
+      // Instantiate the p2wdb and bch-dex-lib libraries
+      this.addToModal('Instantiating P2WDB and DEX libraries')
+      const wif = bchWallet.walletInfo.privateKey
+
+      // Instantiate p2wdb library.
+      // const P2WDBLib = this.state.appData.P2WDB
+      const p2wdbRead = new P2WDB.Read()
+      const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
+
+      // Instantiate dex library
+      // const BchDexLib = this.state.appData.BchDexLib
+      const bchDexLib = new BchDexLib({ wallet: bchWallet, p2wdbRead, p2wdbWrite })
+
       // Close the modal once initialization is done.
       this.setState({
         showStartModal: false,
         asyncInitFinished: true,
-        asyncInitSucceeded: true
+        asyncInitSucceeded: true,
+        dex: bchDexLib,
+        p2wdb: { p2wdbRead, p2wdbWrite }
       })
     } catch (err) {
       this.modalBody = [
@@ -171,8 +186,8 @@ class App extends React.Component {
       servers: this.state.servers, // Alternative back end servers
 
       Sweep: this.state.Sweep, // Sweep library
-      BchDexLib: this.state.BchDexLib,
-      P2WDB: this.state.P2WDB
+      dex: this.state.dex,
+      p2wdb: this.state.p2wdb
     }
 
     return (

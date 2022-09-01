@@ -159,33 +159,14 @@ class Offers extends React.Component {
         hideSpinner: false
       })
 
-      // const mnemonic = this.state.appData.bchWallet.walletInfo.mnemonic
-      const wif = this.state.appData.bchWallet.walletInfo.privateKey
-      const wallet = this.state.appData.bchWallet
+      // Generate a Counter Offer.
+      const bchDexLib = this.state.appData.dex
+      const p2wdbOut = await bchDexLib.take.takeOffer(targetOffer)
+      console.log('p2wdbOut: ', p2wdbOut)
 
-      // Instantiate p2wdb library.
-      const P2WDB = this.state.appData.P2WDB
-      const p2wdbRead = new P2WDB.Read()
-      const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
-
-      // console.log('done')
-
-      const BchDexLib = this.state.appData.BchDexLib
-      const bchDexLib = new BchDexLib({ wallet, p2wdbRead, p2wdbWrite })
-
-      // const options = {
-      //   method: 'post',
-      //   url: `${SERVER}offer/take`,
-      //   data: {
-      //     offerCid: targetOffer
-      //   }
-      // }
-
-      // const result = await axios.request(options)
-      // console.log('result.data: ', result.data)
-      // const p2wdbHash = result.data.hash
-
-      const p2wdbHash = await bchDexLib.take.takeOffer(targetOffer)
+      // Handle different output types.
+      let p2wdbHash = p2wdbOut.hash
+      if (p2wdbHash.hash) p2wdbHash = p2wdbHash.hash
 
       // Add link to output
       const modalBody = []

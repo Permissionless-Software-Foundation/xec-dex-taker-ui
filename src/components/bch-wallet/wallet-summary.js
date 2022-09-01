@@ -34,20 +34,10 @@ class WalletSummary extends React.Component {
   }
 
   async componentDidMount () {
-    const wif = this.state.appData.bchWallet.walletInfo.privateKey
-    const wallet = this.state.appData.bchWallet
-
-    // Instantiate p2wdb library.
-    const P2WDB = this.state.appData.P2WDB
-    const p2wdbRead = new P2WDB.Read()
-    const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
-
-    // Instantiate the BchDexLib
-    const BchDexLib = this.state.appData.BchDexLib
-    const bchDexLib = new BchDexLib({ wallet, p2wdbRead, p2wdbWrite })
-
+    // Get the keypair that holds Counter Offer UTXOs.
+    const bchDexLib = this.state.appData.dex
     const keyPair = await bchDexLib.take.util.getKeyPair(1)
-    console.log('keyPair: ', keyPair)
+    // console.log('keyPair: ', keyPair)
 
     // Update the app data with the info.
     const newAppData = this.state.appData

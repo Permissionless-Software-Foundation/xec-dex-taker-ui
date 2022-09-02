@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.bch-wallet.app',
-  appName: 'bch-wallet-web3',
+  appId: 'com.bch-dex-taker.app',
+  appName: 'bch-dex-taker',
   webDir: 'build',
   bundledWebRuntime: false
 };

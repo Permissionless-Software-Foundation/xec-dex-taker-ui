@@ -146,7 +146,7 @@ class App extends React.Component {
 
       // Instantiate dex library
       // const BchDexLib = this.state.appData.BchDexLib
-      const bchDexLib = new BchDexLib({ wallet: bchWallet, p2wdbRead, p2wdbWrite })
+      const bchDexLib = new BchDexLib({ bchWallet, p2wdbRead, p2wdbWrite })
 
       // Close the modal once initialization is done.
       this.setState({

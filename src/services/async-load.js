@@ -80,7 +80,7 @@ class AsyncLoad {
   }
 
   // Initialize the BCH wallet
-  async initWallet (restURL, mnemonic, setMnemonic, updateBchWalletState) {
+  async initWallet (restURL, mnemonic, setLSState, updateBchWalletState) {
     const options = {
       interface: 'consumer-api',
       restURL,
@@ -106,7 +106,7 @@ class AsyncLoad {
     // Save the mnemonic to local storage.
     if (!mnemonic) {
       const newMnemonic = wallet.walletInfo.mnemonic
-      setMnemonic(newMnemonic)
+      setLSState({ mnemonic: newMnemonic })
     }
 
     this.wallet = wallet

@@ -5,6 +5,8 @@
 // Global npm libraries
 import React from 'react'
 import { useQueryParam, StringParam } from 'use-query-params'
+import P2WDB from 'p2wdb'
+import BchDexLib from 'bch-dex-lib'
 
 // Local libraries
 import './App.css'
@@ -95,17 +97,17 @@ class App extends React.Component {
       this.addToModal('Loading minimal-slp-wallet')
       await this.asyncLoad.loadWalletLib()
 
-      this.addToModal('Loading bch-sweep-lib')
-      const Sweep = await this.asyncLoad.loadSweepLib()
-      this.setState({ Sweep })
-
-      this.addToModal('Loading bch-dex-lib')
-      const BchDexLib = await this.asyncLoad.loadBchDexLib()
-      this.setState({ BchDexLib })
-
-      this.addToModal('Loading p2wdb')
-      const P2WDB = await this.asyncLoad.loadP2wdbLib()
-      this.setState({ P2WDB })
+      // this.addToModal('Loading bch-sweep-lib')
+      // const Sweep = await this.asyncLoad.loadSweepLib()
+      // this.setState({ Sweep })
+      //
+      // this.addToModal('Loading bch-dex-lib')
+      // const BchDexLib = await this.asyncLoad.loadBchDexLib()
+      // this.setState({ BchDexLib })
+      //
+      // this.addToModal('Loading p2wdb')
+      // const P2WDB = await this.asyncLoad.loadP2wdbLib()
+      // this.setState({ P2WDB })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')
@@ -135,12 +137,12 @@ class App extends React.Component {
 
       // Instantiate the p2wdb and bch-dex-lib libraries
       this.addToModal('Instantiating P2WDB and DEX libraries')
-      const wif = bchWallet.walletInfo.privateKey
+      // const wif = bchWallet.walletInfo.privateKey
 
       // Instantiate p2wdb library.
       // const P2WDBLib = this.state.appData.P2WDB
       const p2wdbRead = new P2WDB.Read()
-      const p2wdbWrite = new P2WDB.Write({ wif, interface: 'consumer-api' })
+      const p2wdbWrite = new P2WDB.Write({ bchWallet })
 
       // Instantiate dex library
       // const BchDexLib = this.state.appData.BchDexLib

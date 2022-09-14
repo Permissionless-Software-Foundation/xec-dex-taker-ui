@@ -270,12 +270,11 @@ class App extends React.Component {
     const oldState = _this.state.bchWalletState
 
     const bchWalletState = Object.assign({}, oldState, walletObj)
+    console.log(`New wallet state: ${JSON.stringify(bchWalletState, null, 2)}`)
 
     _this.setState({
       bchWalletState
     })
-
-    // console.log(`New wallet state: ${JSON.stringify(bchWalletState, null, 2)}`)
   }
 }
 

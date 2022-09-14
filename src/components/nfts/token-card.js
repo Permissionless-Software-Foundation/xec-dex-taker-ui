@@ -4,7 +4,7 @@
 
 // Global npm libraries
 import React from 'react'
-import { Container, Row, Col, Card, Button } from 'react-bootstrap'
+import { Container, Row, Col, Card } from 'react-bootstrap'
 import BuyNftButton from './buy-button'
 import InfoButton from './info-button'
 import FlagButton from './flag-button'
@@ -70,24 +70,6 @@ function TokenCard (props) {
       </Col>
     </>
   )
-}
-
-async function flagOffer (props) {
-  console.log('Flag button pressed.')
-
-  const token = props.token
-  console.log('token: ', token)
-  const cid = token.p2wdbHash
-
-  // console.log('appData: ', appData)
-
-  // Generate a Counter Offer.
-  const bchDexLib = props.appData.dex
-  const p2wdbOut = await bchDexLib.flag.flagOffer(cid)
-  console.log('p2wdbOut: ', p2wdbOut)
-
-  const hash = p2wdbOut.hash
-  console.log(`Token flagged with P2WDB record ${hash}`)
 }
 
 export default TokenCard

@@ -7,6 +7,7 @@ import React from 'react'
 import { Container, Row, Col, Card, Button } from 'react-bootstrap'
 import BuyNftButton from './buy-button'
 import InfoButton from './info-button'
+import FlagButton from './flag-button'
 
 // Local libraries
 // import InfoButton from './info-button'
@@ -55,7 +56,7 @@ function TokenCard (props) {
                 </Col>
 
                 <Col>
-                  <Button onClick={(e) => flagOffer(props)} variant='danger'>Flag</Button>
+                  <FlagButton appData={props.appData} offer={props.token} />
                 </Col>
 
                 <Col>

@@ -145,16 +145,18 @@ class Offers extends React.Component {
 
       thisOffer.p2wdbHash = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
 
+      // console.log('this.state.appData: ', this.state.appData)
+
       // Convert sats to BCH, and then calculate cost in USD.
       const bchjs = this.state.appData.bchWallet.bchjs
       const rateInSats = parseInt(thisOffer.rateInBaseUnit)
       // console.log('rateInSats: ', rateInSats)
       const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
       // console.log('bchCost: ', bchCost)
-      // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
-      let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
-      usdPrice = bchjs.Util.floor2(usdPrice)
-      const priceStr = `$${usdPrice.toFixed(2)}`
+      // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
+      // console.log('usdPrice: ', usdPrice)
+      const priceStr = `$${usdPrice.toFixed(3)}`
       thisOffer.usdPrice = priceStr
 
       offers.push(thisOffer)
@@ -163,6 +165,7 @@ class Offers extends React.Component {
     this.setState({
       offers
     })
+    // console.log('offers: ', offers)
   }
 
   async handleBuy (event) {
@@ -214,7 +217,7 @@ class Offers extends React.Component {
     try {
       const options = {
         method: 'GET',
-        url: `${SERVER}offer/list/`,
+        url: `${SERVER}offer/list/fungible/0`,
         data: {}
       }
       const result = await axios.request(options)

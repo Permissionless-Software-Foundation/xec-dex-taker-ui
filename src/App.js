@@ -7,6 +7,7 @@ import React from 'react'
 import { useQueryParam, StringParam } from 'use-query-params'
 import P2WDB from 'p2wdb'
 import BchDexLib from 'bch-dex-lib'
+import SweepLib from 'bch-token-sweep'
 
 // Local libraries
 import './App.css'
@@ -73,7 +74,7 @@ class App extends React.Component {
       },
 
       // Will be replaced by library class once the library loads.
-      Sweep: null,
+      Sweep: SweepLib,
       dex: null,
       p2wcb: null
     }

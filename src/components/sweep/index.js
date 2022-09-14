@@ -181,6 +181,7 @@ class SweepWif extends React.Component {
 
       await this.updateWalletState()
     } catch (err) {
+      console.error(err)
       this.setState({
         hideSpinner: true,
         statusMsg: (<b>{`Error: ${err.message}`}</b>)

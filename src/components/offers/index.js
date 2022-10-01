@@ -64,7 +64,8 @@ class Offers extends React.Component {
       // Modal state
       showModal: false,
       modalBody: [],
-      hideSpinner: false
+      hideSpinner: false,
+      denyClose: false
     }
 
     // Bind this do event handlers
@@ -85,7 +86,12 @@ class Offers extends React.Component {
       <>
         {
           this.state.showModal
-            ? <WaitingModal heading={heading} body={this.state.modalBody} hideSpinner={this.state.hideSpinner} />
+            ? <WaitingModal
+                heading={heading}
+                body={this.state.modalBody}
+                hideSpinner={this.state.hideSpinner}
+                denyClose={this.state.denyClose}
+              />
             : null
         }
         <Container>
@@ -179,7 +185,8 @@ class Offers extends React.Component {
       this.setState({
         showModal: true,
         modalBody: ['Generating Counter Offer...', '(This can take a couple minutes)'],
-        hideSpinner: false
+        hideSpinner: false,
+        denyClose: true
       })
 
       // Generate a Counter Offer.
@@ -199,15 +206,18 @@ class Offers extends React.Component {
       modalBody.push('The money has not yet left your wallet! It is still under your control.')
       modalBody.push('If the sellers node is online, they will accept the Counter Offer you just generated in a few minutes.')
       modalBody.push('If the tokens never show up, you can sweep the funds back into your wallet.')
+
       this.setState({
         modalBody,
-        hideSpinner: true
+        hideSpinner: true,
+        denyClose: false
       })
     } catch (err) {
       this.setState({
         showModal: true,
         modalBody: ['Error trying to generate Counter Offer!', err.message],
-        hideSpinner: true
+        hideSpinner: true,
+        denyClose: false
       })
     }
   }

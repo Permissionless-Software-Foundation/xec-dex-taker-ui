@@ -55,6 +55,7 @@ class App extends React.Component {
       asyncInitSucceeded: null, // Did startup finish successfully?
       modalBody: [], // Strings displayed in the modal
       hideSpinner: false, // Spinner gif in modal
+      denyClose: false,
 
       // The wallet state make this a true progressive web app (PWA). As
       // balances, UTXOs, and tokens are retrieved, this state is updated.
@@ -96,6 +97,11 @@ class App extends React.Component {
   async componentDidMount () {
     try {
       this.addToModal('Loading minimal-slp-wallet')
+
+      this.setState({
+        denyClose: true
+      })
+
       await this.asyncLoad.loadWalletLib()
 
       // this.addToModal('Loading bch-sweep-lib')
@@ -155,7 +161,8 @@ class App extends React.Component {
         asyncInitFinished: true,
         asyncInitSucceeded: true,
         dex: bchDexLib,
-        p2wdb: { p2wdbRead, p2wdbWrite }
+        p2wdb: { p2wdbRead, p2wdbWrite },
+        denyClose: false
       })
     } catch (err) {
       this.modalBody = [
@@ -168,7 +175,8 @@ class App extends React.Component {
         hideSpinner: true,
         showStartModal: true,
         asyncInitFinished: true,
-        asyncInitSucceeded: false
+        asyncInitSucceeded: false,
+        denyClose: false
       })
     }
   }
@@ -211,7 +219,7 @@ class App extends React.Component {
                 modalBody={this.state.modalBody}
                 hideSpinner={this.state.hideSpinner}
                 appData={appData}
-                denyClose={this.state.showStartModal}
+                denyClose={this.state.denyClose}
               />
             : <InitializedView
                 wallet={this.state.wallet}
@@ -287,7 +295,12 @@ function UninitializedView (props) {
 
   return (
     <>
-      <WaitingModal heading={heading} body={props.modalBody} hideSpinner={props.hideSpinner} denyClose={props.denyClose} />
+      <WaitingModal
+        heading={heading}
+        body={props.modalBody}
+        hideSpinner={props.hideSpinner}
+        denyClose={props.denyClose}
+      />
 
       {
         _this.state.asyncInitFinished

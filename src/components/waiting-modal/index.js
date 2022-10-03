@@ -5,18 +5,19 @@
 */
 
 // Global npm libraries
-import React, { useState } from 'react'
+import React from 'react'
+// import React, { useState } from 'react'
 import { Container, Row, Col, Modal, Spinner } from 'react-bootstrap'
 
 function ModalTemplate (props) {
-  const [show, setShow] = useState(true)
+  // const [show, setShow] = useState(true)
 
   const handleClose = () => {
     // Refuse to close the modal if denyClose is set.
     console.log(`props.denyClose: ${props.denyClose}`)
     if (props.denyClose) return
 
-    setShow(false)
+    // setShow(false)
 
     if (props.closeFunc) {
       props.closeFunc()
@@ -26,7 +27,7 @@ function ModalTemplate (props) {
   // const handleShow = () => setShow(true)
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>{props.heading}</Modal.Title>
       </Modal.Header>

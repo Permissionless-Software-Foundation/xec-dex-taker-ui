@@ -6,7 +6,7 @@
 import React from 'react'
 import { useQueryParam, StringParam } from 'use-query-params'
 import P2WDB from 'p2wdb'
-import BchDexLib from 'bch-dex-lib'
+import BchDexLib from 'bch-dex-lib/index.js'
 import SweepLib from 'bch-token-sweep'
 
 // Local libraries

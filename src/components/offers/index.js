@@ -68,8 +68,9 @@ class Offers extends React.Component {
       denyClose: false
     }
 
-    // Bind this do event handlers
+    // Bind 'this' object to functions below.
     this.handleBuy = this.handleBuy.bind(this)
+    this.onModalClose = this.onModalClose.bind(this)
 
     // Encapsulate dependencies
     this.verify = new VerifiedTokens()
@@ -91,6 +92,7 @@ class Offers extends React.Component {
                 body={this.state.modalBody}
                 hideSpinner={this.state.hideSpinner}
                 denyClose={this.state.denyClose}
+                closeFunc={this.onModalClose}
               />
             : null
         }
@@ -249,6 +251,10 @@ class Offers extends React.Component {
     } catch (err) {
       console.warn('Error in cutString() ', err)
     }
+  }
+
+  onModalClose () {
+    this.setState({ showModal: false })
   }
 }
 

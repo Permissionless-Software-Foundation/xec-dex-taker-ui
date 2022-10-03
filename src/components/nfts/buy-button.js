@@ -31,6 +31,7 @@ class BuyNftButton extends React.Component {
 
     // Bind this object to event handlers
     this.handleBuy = this.handleBuy.bind(this)
+    this.onModalClose = this.onModalClose.bind(this)
   }
 
   render () {
@@ -44,6 +45,7 @@ class BuyNftButton extends React.Component {
                 body={this.state.modalBody}
                 hideSpinner={this.state.hideSpinner}
                 denyClose={this.state.denyClose}
+                closeFunc={this.onModalClose}
               />
             : null
         }
@@ -107,6 +109,10 @@ class BuyNftButton extends React.Component {
         denyClose: false
       })
     }
+  }
+
+  onModalClose () {
+    this.setState({ showModal: false })
   }
 }
 

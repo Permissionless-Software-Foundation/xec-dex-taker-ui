@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.bch-dex-taker.app',
-  appName: 'bch-dex-taker',
+  appId: 'com.slp_dex.app',
+  appName: 'SLP DEX',
   webDir: 'build',
   bundledWebRuntime: false
 };

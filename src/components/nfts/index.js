@@ -9,6 +9,7 @@ import axios from 'axios'
 import Jdenticon from '@chris.troutner/react-jdenticon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRedo } from '@fortawesome/free-solid-svg-icons'
+import SlpTokenMedia from 'slp-token-media'
 
 // Local libraries
 import config from '../../config'
@@ -32,6 +33,10 @@ class NFTs extends React.Component {
     // Bind this object to event handlers
     this.handleOffers = this.handleOffers.bind(this)
     this.handleNextPage = this.handleNextPage.bind(this)
+
+    // Instantiate the token media library.
+    const wallet = this.state.appData.bchWallet
+    this.slpTokenMedia = new SlpTokenMedia({ wallet })
   }
 
   // Executes when the component mounts.
@@ -127,7 +132,7 @@ class NFTs extends React.Component {
         offers
       })
 
-      await this.lazyLoadTokenIcons()
+      await this.lazyLoadTokenIcons2()
     } catch (err) {
       console.error('Error in handleOffers: ', err)
       // Do NOT throw errors
@@ -255,6 +260,34 @@ class NFTs extends React.Component {
     }
 
     return tokenCards
+  }
+
+  async lazyLoadTokenIcons2 () {
+    const offers = this.state.offers
+    // console.log(`lazy loading these tokens: ${JSON.stringify(tokens, null, 2)}`)
+
+    // const wallet = this.state.appData.bchWallet
+
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+      // const tokenFound = false
+
+      // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
+
+      if (!thisOffer.iconDownloaded) {
+        console.log(`token ${thisOffer.tokenId} needs icon download`)
+      }
+
+      let tokenData = thisOffer.tokenData
+      if (!tokenData) {
+        // Get the token data from psf-slp-indexer
+        // tokenData = await wallet.getTokenData(thisOffer.tokenId)
+        tokenData = await this.slpTokenMedia.getIcon({ tokenId: thisOffer.tokenId })
+        console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
+      }
+
+      thisOffer.tokenData = tokenData
+    }
   }
 
   // This function is called by the componentDidMount() lifecycle function.

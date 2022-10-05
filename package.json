@@ -8,7 +8,7 @@
     "@fortawesome/free-solid-svg-icons": "6.1.2",
     "@fortawesome/react-fontawesome": "0.2.0",
     "axios": "0.27.2",
-    "bch-dex-lib": "1.3.5",
+    "bch-dex-lib": "1.3.6",
     "bch-message-lib": "2.2.1",
     "bch-token-sweep": "2.1.2",
     "bootstrap": "5.2.0",
@@ -20,6 +20,7 @@
     "react-bs-datatable": "3.5.0",
     "react-dom": "18.2.0",
     "react-scripts": "5.0.1",
+    "slp-token-media": "1.1.1",
     "use-local-storage-state": "18.1.0",
     "use-query-params": "1.2.3"
   },

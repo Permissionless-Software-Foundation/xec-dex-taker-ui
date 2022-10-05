@@ -6,7 +6,7 @@
 import React from 'react'
 import { useQueryParam, StringParam } from 'use-query-params'
 import P2WDB from 'p2wdb'
-import BchDexLib from 'bch-dex-lib/index.js'
+import BchDexLib from 'bch-dex-lib'
 import SweepLib from 'bch-token-sweep'
 
 // Local libraries
@@ -56,6 +56,7 @@ class App extends React.Component {
       modalBody: [], // Strings displayed in the modal
       hideSpinner: false, // Spinner gif in modal
       denyClose: false,
+      showModal: true,
 
       // The wallet state make this a true progressive web app (PWA). As
       // balances, UTXOs, and tokens are retrieved, this state is updated.
@@ -90,6 +91,7 @@ class App extends React.Component {
 
     // Bind the 'this' object to event handlers
     this.passMnemonic = this.passMnemonic.bind(this)
+    this.onModalClose = this.onModalClose.bind(this)
 
     _this = this
   }
@@ -220,6 +222,7 @@ class App extends React.Component {
                 hideSpinner={this.state.hideSpinner}
                 appData={appData}
                 denyClose={this.state.denyClose}
+                closeFunc={this.onModalClose}
               />
             : <InitializedView
                 wallet={this.state.wallet}
@@ -232,6 +235,11 @@ class App extends React.Component {
         <Footer appData={appData} />
       </>
     )
+  }
+
+  onModalClose () {
+    console.log('closing modal')
+    this.setState({ showModal: false })
   }
 
   // Add a new line to the waiting modal.
@@ -279,7 +287,7 @@ class App extends React.Component {
     const oldState = _this.state.bchWalletState
 
     const bchWalletState = Object.assign({}, oldState, walletObj)
-    console.log(`New wallet state: ${JSON.stringify(bchWalletState, null, 2)}`)
+    // console.log(`New wallet state: ${JSON.stringify(bchWalletState, null, 2)}`)
 
     _this.setState({
       bchWalletState
@@ -295,12 +303,20 @@ function UninitializedView (props) {
 
   return (
     <>
-      <WaitingModal
-        heading={heading}
-        body={props.modalBody}
-        hideSpinner={props.hideSpinner}
-        denyClose={props.denyClose}
-      />
+      {
+        _this.state.showModal
+          ? (
+            <WaitingModal
+              heading={heading}
+              body={props.modalBody}
+              hideSpinner={props.hideSpinner}
+              denyClose={props.denyClose}
+              closeFunc={props.closeFunc}
+            />
+            )
+          : null
+
+      }
 
       {
         _this.state.asyncInitFinished

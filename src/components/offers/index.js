@@ -162,10 +162,12 @@ class Offers extends React.Component {
       const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
       // console.log('bchCost: ', bchCost)
       // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
-      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
+      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice
       // console.log('usdPrice: ', usdPrice)
       const priceStr = `$${usdPrice.toFixed(3)}`
       thisOffer.usdPrice = priceStr
+
+      // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
       offers.push(thisOffer)
     }

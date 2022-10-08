@@ -132,7 +132,7 @@ class NFTs extends React.Component {
         offers
       })
 
-      await this.lazyLoadTokenIcons2()
+      await this.lazyLoadTokenIcons()
     } catch (err) {
       console.error('Error in handleOffers: ', err)
       // Do NOT throw errors
@@ -169,7 +169,7 @@ class NFTs extends React.Component {
         // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
         let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
         usdPrice = bchjs.Util.floor2(usdPrice)
-        const priceStr = `$${usdPrice.toFixed(2)}`
+        const priceStr = `$${usdPrice.toFixed(3)}`
         thisOffer.usdPrice = priceStr
       }
 
@@ -274,10 +274,7 @@ class NFTs extends React.Component {
 
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
-      if (!thisOffer.iconDownloaded) {
-        console.log(`token ${thisOffer.tokenId} needs icon download`)
-      }
-
+      // Get token data if it hasn't already been downloaded.
       let tokenData = thisOffer.tokenData
       if (!tokenData) {
         // Get the token data from psf-slp-indexer
@@ -285,9 +282,39 @@ class NFTs extends React.Component {
         tokenData = await this.slpTokenMedia.getIcon({ tokenId: thisOffer.tokenId })
         console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
       }
-
       thisOffer.tokenData = tokenData
+
+      if (!thisOffer.iconDownloaded) {
+        console.log(`token ${thisOffer.tokenId} needs icon download`)
+
+        if (thisOffer.tokenData.optimizedTokenIcon) {
+          const newIcon = (
+            <Card.Img src={thisOffer.tokenData.optimizedTokenIcon} />
+          )
+
+          // Add the JSX for the icon to the token object.
+          thisOffer.icon = newIcon
+          // thisOffer.mutableData = mutableData
+        } else if (thisOffer.tokenData.tokenIcon) {
+          const newIcon = (
+            <Card.Img src={thisOffer.tokenData.tokenIcon} />
+          )
+
+          // Add the JSX for the icon to the token object.
+          thisOffer.icon = newIcon
+          // thisOffer.mutableData = mutableData
+        }
+
+        thisOffer.iconDownloaded = true
+      }
+
+      // Trigger a render with the new token icon.
+      this.setState({ offers })
     }
+
+    this.setState({
+      iconsAreLoaded: true
+    })
   }
 
   // This function is called by the componentDidMount() lifecycle function.

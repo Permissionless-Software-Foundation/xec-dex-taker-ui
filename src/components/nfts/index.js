@@ -9,7 +9,7 @@ import axios from 'axios'
 import Jdenticon from '@chris.troutner/react-jdenticon'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRedo } from '@fortawesome/free-solid-svg-icons'
-import SlpTokenMedia from 'slp-token-media'
+import RetryQueue from '@chris.troutner/retry-queue'
 
 // Local libraries
 import config from '../../config'
@@ -30,13 +30,18 @@ class NFTs extends React.Component {
       page: 0
     }
 
+    // Encapsulate dependencies
+    this.retryQueue = new RetryQueue({
+      concurrency: 2,
+      attempts: 2,
+      retryPeriod: 1000
+    })
+
     // Bind this object to event handlers
     this.handleOffers = this.handleOffers.bind(this)
     this.handleNextPage = this.handleNextPage.bind(this)
-
-    // Instantiate the token media library.
-    const wallet = this.state.appData.bchWallet
-    this.slpTokenMedia = new SlpTokenMedia({ wallet })
+    this.getTokenDataWrapper = this.getTokenDataWrapper.bind(this)
+    this.tokenDownloadedCB = this.tokenDownloadedCB.bind(this)
   }
 
   // Executes when the component mounts.
@@ -126,13 +131,13 @@ class NFTs extends React.Component {
   async handleOffers () {
     try {
       const offers = await this.getNftOffers()
-      // console.log('offers: ', offers)
+      console.log('offers: ', offers)
 
       this.setState({
         offers
       })
 
-      await this.lazyLoadTokenIcons()
+      await this.lazyLoadTokenIcons3()
     } catch (err) {
       console.error('Error in handleOffers: ', err)
       // Do NOT throw errors
@@ -163,12 +168,13 @@ class NFTs extends React.Component {
         // Convert sats to BCH, and then calculate cost in USD.
         const bchjs = this.state.appData.bchWallet.bchjs
         const rateInSats = parseInt(thisOffer.rateInBaseUnit)
-        // console.log('rateInSats: ', rateInSats)
+        console.log('rateInSats: ', rateInSats)
         const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
-        // console.log('bchCost: ', bchCost)
-        // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
-        let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
-        usdPrice = bchjs.Util.floor2(usdPrice)
+        console.log('bchCost: ', bchCost)
+        console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+        const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
+        // usdPrice = bchjs.Util.floor2(usdPrice)
+        console.log(`usdPrice: ${usdPrice}`)
         const priceStr = `$${usdPrice.toFixed(3)}`
         thisOffer.usdPrice = priceStr
       }
@@ -262,11 +268,89 @@ class NFTs extends React.Component {
     return tokenCards
   }
 
-  async lazyLoadTokenIcons2 () {
+  async lazyLoadTokenIcons3 () {
     const offers = this.state.offers
     // console.log(`lazy loading these tokens: ${JSON.stringify(tokens, null, 2)}`)
 
     // const wallet = this.state.appData.bchWallet
+
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+
+      // Get token data if it hasn't already been downloaded.
+      const tokenData = thisOffer.tokenData
+      if (!tokenData) {
+        // Prepare the object to pass to the queue.
+        const inObj = {
+          offer: thisOffer,
+          callback: this.tokenDownloadedCB
+        }
+
+        // Kick off async token icon download. This function is not 'awaited'
+        // as it should not block execution.
+        this.retryQueue.addToQueue(this.getTokenDataWrapper, inObj)
+      }
+    }
+  }
+
+  // This function is called once the token data has finished downloading.
+  // It updates the state of the app, to render the token icon.
+  tokenDownloadedCB (offer) {
+    if (!offer.iconDownloaded) {
+      console.log(`Updating token icon for token ID ${offer.tokenId}`)
+
+      if (offer.tokenData.optimizedTokenIcon) {
+        // Use the optimized token icon URL if it is available.
+
+        const newIcon = (
+          <Card.Img src={offer.tokenData.optimizedTokenIcon} />
+        )
+
+        // Add the JSX for the icon to the token object.
+        offer.icon = newIcon
+        // thisOffer.mutableData = mutableData
+      } else if (offer.tokenData.tokenIcon) {
+        // If the optimized token icon URL is not available, try to use the
+        // original token icon URL.
+
+        const newIcon = (
+          <Card.Img src={offer.tokenData.tokenIcon} />
+        )
+
+        // Add the JSX for the icon to the token object.
+        offer.icon = newIcon
+        // thisOffer.mutableData = mutableData
+      }
+
+      // If neither token icon URL is available, default to the JDenticon.
+
+      offer.iconDownloaded = true
+
+      // Replace the offer in the offers array.
+      const offers = this.state.offers
+      const offerIndex = offers.findIndex(x => x.tokenId === offer.tokenId)
+      if (offerIndex) {
+        offers[offerIndex] = offer
+      }
+
+      // Trigger a render with the new token icon.
+      this.setState({ offers })
+    }
+  }
+
+  // This function wraps the bch-dex-lib getTokenData() function in a promise-based
+  // function with an object input, so that it can be called by the retry-queue.
+  async getTokenDataWrapper (inObj) {
+    const { offer, callback } = inObj
+
+    await this.state.appData.dex.tokenData.getTokenData(offer, callback)
+  }
+
+  async lazyLoadTokenIcons2 () {
+    const offers = this.state.offers
+    // console.log(`lazy loading these tokens: ${JSON.stringify(tokens, null, 2)}`)
+
+    const wallet = this.state.appData.bchWallet
 
     for (let i = 0; i < offers.length; i++) {
       const thisOffer = offers[i]
@@ -279,7 +363,8 @@ class NFTs extends React.Component {
       if (!tokenData) {
         // Get the token data from psf-slp-indexer
         // tokenData = await wallet.getTokenData(thisOffer.tokenId)
-        tokenData = await this.slpTokenMedia.getIcon({ tokenId: thisOffer.tokenId })
+        // tokenData = await this.slpTokenMedia.getIcon({ tokenId: thisOffer.tokenId })
+        tokenData = await wallet.getTokenData2(thisOffer.tokenId)
         console.log(`tokenData: ${JSON.stringify(tokenData, null, 2)}`)
       }
       thisOffer.tokenData = tokenData
@@ -288,6 +373,8 @@ class NFTs extends React.Component {
         console.log(`token ${thisOffer.tokenId} needs icon download`)
 
         if (thisOffer.tokenData.optimizedTokenIcon) {
+          // Use the optimized token icon URL if it is available.
+
           const newIcon = (
             <Card.Img src={thisOffer.tokenData.optimizedTokenIcon} />
           )
@@ -296,6 +383,9 @@ class NFTs extends React.Component {
           thisOffer.icon = newIcon
           // thisOffer.mutableData = mutableData
         } else if (thisOffer.tokenData.tokenIcon) {
+          // If the optimized token icon URL is not available, try to use the
+          // original token icon URL.
+
           const newIcon = (
             <Card.Img src={thisOffer.tokenData.tokenIcon} />
           )
@@ -304,6 +394,8 @@ class NFTs extends React.Component {
           thisOffer.icon = newIcon
           // thisOffer.mutableData = mutableData
         }
+
+        // If neither token icon URL is available, default to the JDenticon.
 
         thisOffer.iconDownloaded = true
       }

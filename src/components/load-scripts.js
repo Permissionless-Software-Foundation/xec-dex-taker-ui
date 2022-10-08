@@ -5,7 +5,7 @@
 import useScript from '../hooks/use-script'
 
 function LoadScripts () {
-  // useScript('https://unpkg.com/minimal-slp-wallet')
+  // useScript('https://unpkg.com/minimal-slp-wallet?module')
   // useScript('https://unpkg.com/bch-dex-lib')
 
   // Load the libraries from the local directory.

@@ -42,6 +42,7 @@ class NFTs extends React.Component {
     this.handleNextPage = this.handleNextPage.bind(this)
     this.getTokenDataWrapper = this.getTokenDataWrapper.bind(this)
     this.tokenDownloadedCB = this.tokenDownloadedCB.bind(this)
+    this.checkIfIconsAreDownloaded = this.checkIfIconsAreDownloaded.bind(this)
   }
 
   // Executes when the component mounts.
@@ -57,6 +58,38 @@ class NFTs extends React.Component {
     //   await this.handleOffers()
     // }, 30000)
     // this.setState({ reloadInterval })
+
+    this.tokenIconDownloadInterval = setInterval(() => {
+      this.checkIfIconsAreDownloaded()
+    }, 2000)
+  }
+
+  // This function checks to see if all tokens icons have been downloaded. If
+  // they have, it hides the animated 'Loading Token Icons' component and
+  // kills the interval that calls this function.
+  checkIfIconsAreDownloaded () {
+    const offers = this.state.offers
+
+    // Exit if the offers array is empty.
+    if (!offers.length) return
+
+    // Loop through each offer.
+    let iconsStillDownloading = false
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+
+      if (!thisOffer.iconDownloaded) {
+        iconsStillDownloading = true
+      }
+    }
+
+    if (!iconsStillDownloading) {
+      // Hide the 'Loading Token Icons' component.
+      this.setState({ iconsAreLoaded: true })
+
+      // Kill the interval that calls this function.
+      clearInterval(this.tokenIconDownloadInterval)
+    }
   }
 
   render () {
@@ -125,7 +158,7 @@ class NFTs extends React.Component {
       page: nextPage
     })
 
-    this.lazyLoadTokenIcons()
+    this.lazyLoadTokenIcons3()
   }
 
   async handleOffers () {

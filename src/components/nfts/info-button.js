@@ -52,7 +52,7 @@ function InfoButton (props) {
 
             <Row style={{ backgroundColor: '#eee' }}>
               <Col xs={4}><b>Name</b>:</Col>
-              <Col xs={8}>{props.token.tokenData.genesisData.name}</Col>
+              <Col xs={8}>{props.token.tokenData.tokenStats.name}</Col>
             </Row>
 
             <Row>
@@ -66,7 +66,7 @@ function InfoButton (props) {
 
             <Row style={{ backgroundColor: '#eee' }}>
               <Col xs={4}><b>Decimals</b>:</Col>
-              <Col xs={8}>{props.token.tokenData.genesisData.decimals}</Col>
+              <Col xs={8}>{props.token.tokenData.tokenStats.decimals}</Col>
             </Row>
 
             <Row>

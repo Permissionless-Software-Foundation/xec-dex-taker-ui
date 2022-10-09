@@ -39,7 +39,7 @@ function TokenCard (props) {
             <Container>
               <Row>
                 <Col>
-                  {props.token.tokenData ? props.token.tokenData.genesisData.name : null}
+                  {props.token.tokenData ? props.token.tokenData.tokenStats.name : null}
                 </Col>
               </Row>
               <br />

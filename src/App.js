@@ -75,6 +75,10 @@ class App extends React.Component {
         bchUsdPrice: 150
       },
 
+      // Used to cache Offer data, so that token metadata does not need to be
+      // downloaded so often. This state needs to reside in this parent component.
+      offerCache: [],
+
       // Will be replaced by library class once the library loads.
       Sweep: SweepLib,
       dex: null,
@@ -92,6 +96,7 @@ class App extends React.Component {
     // Bind the 'this' object to event handlers
     this.passMnemonic = this.passMnemonic.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
+    this.setOfferCache = this.setOfferCache.bind(this)
 
     _this = this
   }
@@ -205,7 +210,11 @@ class App extends React.Component {
       Sweep: this.state.Sweep, // Sweep library
       dex: this.state.dex,
       p2wdb: this.state.p2wdb,
-      wallet: this.state.bchWallet
+      wallet: this.state.bchWallet,
+
+      // Offer cache
+      offerCache: this.state.offerCache,
+      setOfferCache: this.setOfferCache
     }
 
     return (
@@ -292,6 +301,13 @@ class App extends React.Component {
     _this.setState({
       bchWalletState
     })
+  }
+
+  setOfferCache (newCache) {
+    // this.state.offerCache = newCache
+    this.setState({ offerCache: newCache })
+
+    console.log('Setting offerCache: ', this.state.offerCache)
   }
 }
 

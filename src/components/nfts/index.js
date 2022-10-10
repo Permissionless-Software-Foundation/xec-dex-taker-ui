@@ -27,7 +27,11 @@ class NFTs extends React.Component {
       offers: [],
       iconsAreLoaded: false,
       reloadInterval: null,
-      page: 0
+      page: 0,
+
+      // Pass state from App.js parent to this child component.
+      offerCache: props.appData.offerCache,
+      setOfferCache: props.appData.setOfferCache
     }
 
     // Encapsulate dependencies
@@ -163,8 +167,14 @@ class NFTs extends React.Component {
 
   async handleOffers () {
     try {
-      const offers = await this.getNftOffers()
+      let offers = await this.getNftOffers()
       console.log('offers: ', offers)
+
+      const { hydratedOffers, cachedOfferFound } = this.hydrateOffersFromCache(offers)
+
+      if (cachedOfferFound) {
+        offers = hydratedOffers
+      }
 
       this.setState({
         offers
@@ -175,6 +185,40 @@ class NFTs extends React.Component {
       console.error('Error in handleOffers: ', err)
       // Do NOT throw errors
     }
+  }
+
+  // This function expects an array of offers as input. Each offer is uniquely
+  // identified by it's p2wdbHash property. If that offer has already been
+  // hydrated and exists in the cache, the input entry is replaced with the
+  // hydrated entry from the cache.
+  // This function edits the array in-place, and returns the array.
+  hydrateOffersFromCache (offers) {
+    if (!Array.isArray(offers)) { throw new Error('offers must be an array of Offer objects.') }
+
+    let cachedOfferFound = false
+    const offerCache = this.state.offerCache
+    // console.log('hydrateOffersFromCache() offerCache: ', offerCache)
+
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+      // console.log('hydrateOffersFromCache() thisOffer.p2wdbHash: ', thisOffer.p2wdbHash)
+
+      // Test if the offer already exists in the cache.
+      const cacheIndex = offerCache.findIndex(x => x.p2wdbHash === thisOffer.p2wdbHash)
+      // console.log('hydrateOffersFromCache() cacheIndex: ', cacheIndex)
+
+      // Replace the offer with the hydrated one from the cache, if it exists
+      // in the cache.
+      if (cacheIndex > -1) {
+        offers[i] = offerCache[cacheIndex]
+
+        cachedOfferFound = true
+      }
+    }
+
+    const hydratedOffers = offers
+
+    return { hydratedOffers, cachedOfferFound }
   }
 
   // REST request to get Offer data from bch-dex
@@ -201,13 +245,13 @@ class NFTs extends React.Component {
         // Convert sats to BCH, and then calculate cost in USD.
         const bchjs = this.state.appData.bchWallet.bchjs
         const rateInSats = parseInt(thisOffer.rateInBaseUnit)
-        console.log('rateInSats: ', rateInSats)
+        // console.log('rateInSats: ', rateInSats)
         const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
-        console.log('bchCost: ', bchCost)
-        console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+        // console.log('bchCost: ', bchCost)
+        // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
         const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
         // usdPrice = bchjs.Util.floor2(usdPrice)
-        console.log(`usdPrice: ${usdPrice}`)
+        // console.log(`usdPrice: ${usdPrice}`)
         const priceStr = `$${usdPrice.toFixed(3)}`
         thisOffer.usdPrice = priceStr
       }
@@ -256,10 +300,10 @@ class NFTs extends React.Component {
         // Convert sats to BCH, and then calculate cost in USD.
         const bchjs = this.state.appData.bchWallet.bchjs
         const rateInSats = parseInt(thisOffer.rateInBaseUnit)
-        console.log('rateInSats: ', rateInSats)
+        // console.log('rateInSats: ', rateInSats)
         const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
-        console.log('bchCost: ', bchCost)
-        console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
+        // console.log('bchCost: ', bchCost)
+        // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
         let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
         usdPrice = bchjs.Util.floor2(usdPrice)
         const priceStr = `$${usdPrice.toFixed(2)}`
@@ -361,10 +405,13 @@ class NFTs extends React.Component {
 
       // Replace the offer in the offers array.
       const offers = this.state.offers
-      const offerIndex = offers.findIndex(x => x.tokenId === offer.tokenId)
+      const offerIndex = offers.findIndex(x => x.p2wdbHash === offer.p2wdbHash)
       if (offerIndex) {
         offers[offerIndex] = offer
       }
+
+      // Update the offer cache stored by the parent component.
+      this.state.setOfferCache(offers)
 
       // Trigger a render with the new token icon.
       this.setState({ offers })

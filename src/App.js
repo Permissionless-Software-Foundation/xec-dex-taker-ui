@@ -75,6 +75,11 @@ class App extends React.Component {
         bchUsdPrice: 150
       },
 
+      // Used to cache Offer data, so that token metadata does not need to be
+      // downloaded so often. This state needs to reside in this parent component.
+      nftOfferCache: [],
+      fungibleOfferCache: [],
+
       // Will be replaced by library class once the library loads.
       Sweep: SweepLib,
       dex: null,
@@ -92,6 +97,9 @@ class App extends React.Component {
     // Bind the 'this' object to event handlers
     this.passMnemonic = this.passMnemonic.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
+    this.setNftOfferCache = this.setNftOfferCache.bind(this)
+    this.setFungibleOfferCache = this.setFungibleOfferCache.bind(this)
+    this.getFungibleOfferCache = this.getFungibleOfferCache.bind(this)
 
     _this = this
   }
@@ -105,18 +113,6 @@ class App extends React.Component {
       })
 
       await this.asyncLoad.loadWalletLib()
-
-      // this.addToModal('Loading bch-sweep-lib')
-      // const Sweep = await this.asyncLoad.loadSweepLib()
-      // this.setState({ Sweep })
-      //
-      // this.addToModal('Loading bch-dex-lib')
-      // const BchDexLib = await this.asyncLoad.loadBchDexLib()
-      // this.setState({ BchDexLib })
-      //
-      // this.addToModal('Loading p2wdb')
-      // const P2WDB = await this.asyncLoad.loadP2wdbLib()
-      // this.setState({ P2WDB })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')
@@ -205,7 +201,14 @@ class App extends React.Component {
       Sweep: this.state.Sweep, // Sweep library
       dex: this.state.dex,
       p2wdb: this.state.p2wdb,
-      wallet: this.state.bchWallet
+      wallet: this.state.bchWallet,
+
+      // Offer caches
+      nftOfferCache: this.state.nftOfferCache,
+      setNftOfferCache: this.setNftOfferCache,
+      fungibleOfferCache: this.state.fungibleOfferCache,
+      setFungibleOfferCache: this.setFungibleOfferCache,
+      getFungibleOfferCache: this.getFungibleOfferCache
     }
 
     return (
@@ -292,6 +295,26 @@ class App extends React.Component {
     _this.setState({
       bchWalletState
     })
+  }
+
+  // This function is passed to and called from a child component. It updates
+  // the state managed by this parent component.
+  setNftOfferCache (newCache) {
+    this.setState({ nftOfferCache: newCache })
+
+    // console.log('Setting nftOfferCache: ', this.state.nftOfferCache)
+  }
+
+  // This function is passed to and called from a child component. It updates
+  // the state managed by this parent component.
+  setFungibleOfferCache (newCache) {
+    this.setState({ fungibleOfferCache: newCache })
+
+    // console.log('Setting fungibleOfferCache: ', this.state.fungibleOfferCache)
+  }
+
+  getFungibleOfferCache () {
+    return this.state.fungibleOfferCache
   }
 }
 

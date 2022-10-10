@@ -18,62 +18,38 @@ import Sweep from '../sweep'
 import Offers from '../offers'
 import NFTs from '../nfts'
 
-// let _this
+function AppBody (props) {
+  return (
+    <>
+      {chooseView(props.menuState, props.appData)}
+    </>
+  )
+}
 
-class AppBody extends React.Component {
-  constructor (props) {
-    super(props)
+function chooseView (menuState, appData) {
+  // console.log(`chooseView() menuState: ${menuState}`)
 
-    this.state = {
-      activeView: 0,
-      menuState: props.menuState,
-      appData: props.appData
-    }
+  switch (menuState) {
+    case 0:
+      return (<NFTs appData={appData} />)
+    case 1:
+      return (<Offers appData={appData} />)
+    case 2:
+      return (<BchSend appData={appData} />)
+    case 3:
+      return (<SlpTokens appData={appData} />)
+    case 4:
+      return (<Sweep appData={appData} />)
+    case 5:
+      return (
+        <BchWallet appData={appData} />
+      )
 
-    // This function is passed from the parent component. It's used to update
-    // the BCH wallet state.
-    this.updateBchWalletState = props.appData.updateBchWalletState
-
-    // _this = this
-  }
-
-  render () {
-    // console.log(`AppBody menu state: ${this.props.menuState}`)
-
-    return (
-      <>
-        {this.chooseView(this.props.menuState)}
-      </>
-    )
-  }
-
-  chooseView (menuState) {
-    // console.log(`chooseView() menuState: ${menuState}`)
-
-    switch (menuState) {
-      case 0:
-        return (<NFTs appData={this.state.appData} />)
-      case 1:
-        return (<Offers appData={this.state.appData} />)
-      case 2:
-        return (<BchSend appData={this.state.appData} />)
-      case 3:
-        return (<SlpTokens appData={this.state.appData} />)
-      case 4:
-        return (<Sweep appData={this.state.appData} />)
-      case 5:
-        return (
-          <BchWallet
-            appData={this.state.appData}
-          />
-        )
-
-      // Special Views
-      case 100:
-        return (<ServerSelectView appData={this.state.appData} />)
-      default:
-        return (<NFTs appData={this.state.appData} />)
-    }
+    // Special Views
+    case 100:
+      return (<ServerSelectView appData={appData} />)
+    default:
+      return (<NFTs appData={appData} />)
   }
 }
 

@@ -13,7 +13,7 @@ class VerifiedTokens {
   // token ID in the verified list.
   checkTicker (ticker, tokenId) {
     // Tether
-    if (ticker.includes('USDt')) {
+    if (ticker.includes('USDt') || ticker.includes('USDT') || ticker.includes('usdt')) {
       if (tokenId === this.tetherId) {
         return false
       } else {

@@ -5,50 +5,20 @@
 
 // Global npm libraries
 import React from 'react'
-import { Container, Row, Col, Table, Button } from 'react-bootstrap'
+import { Button } from 'react-bootstrap'
 import axios from 'axios'
-import { DatatableWrapper, TableBody, TableHeader } from 'react-bs-datatable'
+// import { DatatableWrapper, TableBody, TableHeader } from 'react-bs-datatable'
 
 // Local libraries
 import config from '../../config'
 import WaitingModal from '../waiting-modal'
 import VerifiedTokens from './verified'
+import LargeOfferTable from './large-offer-table.js'
+import SmallOfferTable from './small-offer-table.js'
 
 // Global variables and constants
 const SERVER = `${config.server}/`
 // let _this
-
-const TABLE_HEADERS = [
-  {
-    prop: 'ticker',
-    title: 'Ticker',
-    isFilterable: true
-  },
-  {
-    prop: 'tokenId',
-    title: 'Token ID'
-  },
-  {
-    prop: 'buyOrSell',
-    title: 'Type'
-  },
-  {
-    prop: 'p2wdbHash',
-    title: 'P2WDB ID'
-  },
-  {
-    prop: 'numTokens',
-    title: 'Quantity'
-  },
-  {
-    prop: 'usdPrice',
-    title: 'Price (USD)'
-  },
-  {
-    prop: 'button',
-    title: 'Action'
-  }
-]
 
 class Offers extends React.Component {
   constructor (props) {
@@ -96,18 +66,9 @@ class Offers extends React.Component {
               />
             : null
         }
-        <Container>
-          <Row>
-            <Col className='text-break' style={{ textAlign: 'center' }}>
-              <DatatableWrapper body={this.state.offers} headers={TABLE_HEADERS}>
-                <Table>
-                  <TableHeader />
-                  <TableBody />
-                </Table>
-              </DatatableWrapper>
-            </Col>
-          </Row>
-        </Container>
+
+        <SmallOfferTable offers={this.state.offers} />
+        <LargeOfferTable offers={this.state.offers} />
       </>
     )
   }
@@ -149,7 +110,7 @@ class Offers extends React.Component {
       const p2wdbHash = thisOffer.p2wdbHash
       const smallP2wdbHash = this.cutString(p2wdbHash)
 
-      thisOffer.button = (<Button text='Buy' variant='success' size='lg' id={p2wdbHash} onClick={this.handleBuy}>Buy</Button>)
+      thisOffer.button = (<Button text='Buy' variant='success' size='sm' id={p2wdbHash} onClick={this.handleBuy}>Buy</Button>)
 
       thisOffer.p2wdbHash = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
 

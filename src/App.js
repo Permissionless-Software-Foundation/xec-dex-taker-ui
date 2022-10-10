@@ -307,7 +307,7 @@ class App extends React.Component {
     // this.state.offerCache = newCache
     this.setState({ offerCache: newCache })
 
-    console.log('Setting offerCache: ', this.state.offerCache)
+    // console.log('Setting offerCache: ', this.state.offerCache)
   }
 }
 

@@ -78,6 +78,7 @@ class App extends React.Component {
       // Used to cache Offer data, so that token metadata does not need to be
       // downloaded so often. This state needs to reside in this parent component.
       nftOfferCache: [],
+      fungibleOfferCache: [],
 
       // Will be replaced by library class once the library loads.
       Sweep: SweepLib,
@@ -97,6 +98,7 @@ class App extends React.Component {
     this.passMnemonic = this.passMnemonic.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
     this.setNftOfferCache = this.setNftOfferCache.bind(this)
+    this.setFungibleOfferCache = this.setFungibleOfferCache.bind(this)
 
     _this = this
   }
@@ -200,9 +202,11 @@ class App extends React.Component {
       p2wdb: this.state.p2wdb,
       wallet: this.state.bchWallet,
 
-      // Offer cache
+      // Offer caches
       nftOfferCache: this.state.nftOfferCache,
-      setNftOfferCache: this.setNftOfferCache
+      setNftOfferCache: this.setNftOfferCache,
+      fungibleOfferCache: this.state.fungibleOfferCache,
+      setFungibleOfferCache: this.setFungibleOfferCache
     }
 
     return (
@@ -291,10 +295,20 @@ class App extends React.Component {
     })
   }
 
+  // This function is passed to and called from a child component. It updates
+  // the state managed by this parent component.
   setNftOfferCache (newCache) {
     this.setState({ nftOfferCache: newCache })
 
     // console.log('Setting nftOfferCache: ', this.state.nftOfferCache)
+  }
+
+  // This function is passed to and called from a child component. It updates
+  // the state managed by this parent component.
+  setFungibleOfferCache (newCache) {
+    this.setState({ fungibleOfferCache: newCache })
+
+    // console.log('Setting fungibleOfferCache: ', this.state.fungibleOfferCache)
   }
 }
 

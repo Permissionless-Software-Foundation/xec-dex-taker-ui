@@ -35,7 +35,11 @@ class Offers extends React.Component {
       showModal: false,
       modalBody: [],
       hideSpinner: false,
-      denyClose: false
+      denyClose: false,
+
+      // Pass state from App.js parent to this child component.
+      fungibleOfferCache: props.appData.fungibleOfferCache,
+      setFungibleOfferCache: props.appData.setFungibleOfferCache
     }
 
     // Bind 'this' object to functions below.
@@ -87,15 +91,26 @@ class Offers extends React.Component {
   // Get Offer data and manipulate it for the sake of presentation.
   async handleOffers () {
     // Get raw offer data.
-    const offerRawData = await this.getOffers()
-    // console.log(`offers: ${JSON.stringify(offers, null, 2)}`)
+    let offerRawData = await this.getOffers()
 
-    // Formatted Data
+    const { hydratedOffers, cachedOfferFound } = this.hydrateOffersFromCache(offerRawData)
+
+    if (cachedOfferFound) {
+      offerRawData = hydratedOffers
+    }
+
+    // Clone the offerRawData array
     const offers = []
 
     for (let i = 0; i < offerRawData.length; i++) {
       const thisOffer = offerRawData[i]
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
+
+      // Skip if this offer has already been initialize hydated.
+      if (thisOffer.initHydrated) {
+        offers.push(thisOffer)
+        continue
+      }
 
       // Skip scam tokens that try to impersonate verified tokens.
       const isScam = this.verify.checkTicker(thisOffer.ticker, thisOffer.tokenId)
@@ -130,6 +145,9 @@ class Offers extends React.Component {
 
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
+      // Signal that this offer has been hydrated with initial data.
+      thisOffer.initHydrated = true
+
       offers.push(thisOffer)
     }
 
@@ -137,6 +155,40 @@ class Offers extends React.Component {
       offers
     })
     // console.log('offers: ', offers)
+  }
+
+  // This function expects an array of offers as input. Each offer is uniquely
+  // identified by it's p2wdbHash property. If that offer has already been
+  // hydrated and exists in the cache, the input entry is replaced with the
+  // hydrated entry from the cache.
+  // This function edits the array in-place, and returns the array.
+  hydrateOffersFromCache (offers) {
+    if (!Array.isArray(offers)) { throw new Error('offers must be an array of Offer objects.') }
+
+    let cachedOfferFound = false
+    const fungibleOfferCache = this.state.fungibleOfferCache
+    // console.log('hydrateOffersFromCache() offerCache: ', offerCache)
+
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+      // console.log('hydrateOffersFromCache() thisOffer.p2wdbHash: ', thisOffer.p2wdbHash)
+
+      // Test if the offer already exists in the cache.
+      const cacheIndex = fungibleOfferCache.findIndex(x => x.p2wdbHash === thisOffer.p2wdbHash)
+      // console.log('hydrateOffersFromCache() cacheIndex: ', cacheIndex)
+
+      // Replace the offer with the hydrated one from the cache, if it exists
+      // in the cache.
+      if (cacheIndex > -1) {
+        offers[i] = fungibleOfferCache[cacheIndex]
+
+        cachedOfferFound = true
+      }
+    }
+
+    const hydratedOffers = offers
+
+    return { hydratedOffers, cachedOfferFound }
   }
 
   async handleBuy (event) {

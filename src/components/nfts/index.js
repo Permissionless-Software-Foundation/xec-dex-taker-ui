@@ -32,9 +32,9 @@ class NFTs extends React.Component {
 
     // Encapsulate dependencies
     this.retryQueue = new RetryQueue({
-      concurrency: 2,
+      concurrency: 5,
       attempts: 2,
-      retryPeriod: 1000
+      retryPeriod: 2000
     })
 
     // Bind this object to event handlers

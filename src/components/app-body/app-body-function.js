@@ -18,27 +18,7 @@ import Sweep from '../sweep'
 import Offers from '../offers'
 import NFTs from '../nfts'
 
-// let _this
-
 function AppBody (props) {
-  // const menuState = props.menuState
-  // const appData = props.appData
-  // const activeView = 0
-
-  // this.state = {
-  //   activeView: 0,
-  //   menuState: props.menuState,
-  //   appData: props.appData
-  // }
-
-  // This function is passed from the parent component. It's used to update
-  // the BCH wallet state.
-  // this.updateBchWalletState = props.appData.updateBchWalletState
-
-  // _this = this
-
-  // console.log(`AppBody menu state: ${this.props.menuState}`)
-
   return (
     <>
       {chooseView(props.menuState, props.appData)}

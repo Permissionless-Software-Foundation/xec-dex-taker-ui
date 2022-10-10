@@ -77,7 +77,7 @@ class App extends React.Component {
 
       // Used to cache Offer data, so that token metadata does not need to be
       // downloaded so often. This state needs to reside in this parent component.
-      offerCache: [],
+      nftOfferCache: [],
 
       // Will be replaced by library class once the library loads.
       Sweep: SweepLib,
@@ -96,7 +96,7 @@ class App extends React.Component {
     // Bind the 'this' object to event handlers
     this.passMnemonic = this.passMnemonic.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
-    this.setOfferCache = this.setOfferCache.bind(this)
+    this.setNftOfferCache = this.setNftOfferCache.bind(this)
 
     _this = this
   }
@@ -110,18 +110,6 @@ class App extends React.Component {
       })
 
       await this.asyncLoad.loadWalletLib()
-
-      // this.addToModal('Loading bch-sweep-lib')
-      // const Sweep = await this.asyncLoad.loadSweepLib()
-      // this.setState({ Sweep })
-      //
-      // this.addToModal('Loading bch-dex-lib')
-      // const BchDexLib = await this.asyncLoad.loadBchDexLib()
-      // this.setState({ BchDexLib })
-      //
-      // this.addToModal('Loading p2wdb')
-      // const P2WDB = await this.asyncLoad.loadP2wdbLib()
-      // this.setState({ P2WDB })
 
       // Update the list of potential back end servers.
       this.addToModal('Getting alternative servers')
@@ -213,8 +201,8 @@ class App extends React.Component {
       wallet: this.state.bchWallet,
 
       // Offer cache
-      offerCache: this.state.offerCache,
-      setOfferCache: this.setOfferCache
+      nftOfferCache: this.state.nftOfferCache,
+      setNftOfferCache: this.setNftOfferCache
     }
 
     return (
@@ -303,11 +291,10 @@ class App extends React.Component {
     })
   }
 
-  setOfferCache (newCache) {
-    // this.state.offerCache = newCache
-    this.setState({ offerCache: newCache })
+  setNftOfferCache (newCache) {
+    this.setState({ nftOfferCache: newCache })
 
-    // console.log('Setting offerCache: ', this.state.offerCache)
+    // console.log('Setting nftOfferCache: ', this.state.nftOfferCache)
   }
 }
 

@@ -30,8 +30,8 @@ class NFTs extends React.Component {
       page: 0,
 
       // Pass state from App.js parent to this child component.
-      offerCache: props.appData.offerCache,
-      setOfferCache: props.appData.setOfferCache
+      nftOfferCache: props.appData.nftOfferCache,
+      setNftOfferCache: props.appData.setNftOfferCache
     }
 
     // Encapsulate dependencies
@@ -196,7 +196,7 @@ class NFTs extends React.Component {
     if (!Array.isArray(offers)) { throw new Error('offers must be an array of Offer objects.') }
 
     let cachedOfferFound = false
-    const offerCache = this.state.offerCache
+    const nftOfferCache = this.state.nftOfferCache
     // console.log('hydrateOffersFromCache() offerCache: ', offerCache)
 
     for (let i = 0; i < offers.length; i++) {
@@ -204,13 +204,13 @@ class NFTs extends React.Component {
       // console.log('hydrateOffersFromCache() thisOffer.p2wdbHash: ', thisOffer.p2wdbHash)
 
       // Test if the offer already exists in the cache.
-      const cacheIndex = offerCache.findIndex(x => x.p2wdbHash === thisOffer.p2wdbHash)
+      const cacheIndex = nftOfferCache.findIndex(x => x.p2wdbHash === thisOffer.p2wdbHash)
       // console.log('hydrateOffersFromCache() cacheIndex: ', cacheIndex)
 
       // Replace the offer with the hydrated one from the cache, if it exists
       // in the cache.
       if (cacheIndex > -1) {
-        offers[i] = offerCache[cacheIndex]
+        offers[i] = nftOfferCache[cacheIndex]
 
         cachedOfferFound = true
       }
@@ -411,7 +411,7 @@ class NFTs extends React.Component {
       }
 
       // Update the offer cache stored by the parent component.
-      this.state.setOfferCache(offers)
+      this.state.setNftOfferCache(offers)
 
       // Trigger a render with the new token icon.
       this.setState({ offers })

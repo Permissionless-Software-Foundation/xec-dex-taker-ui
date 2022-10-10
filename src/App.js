@@ -99,6 +99,7 @@ class App extends React.Component {
     this.onModalClose = this.onModalClose.bind(this)
     this.setNftOfferCache = this.setNftOfferCache.bind(this)
     this.setFungibleOfferCache = this.setFungibleOfferCache.bind(this)
+    this.getFungibleOfferCache = this.getFungibleOfferCache.bind(this)
 
     _this = this
   }
@@ -206,7 +207,8 @@ class App extends React.Component {
       nftOfferCache: this.state.nftOfferCache,
       setNftOfferCache: this.setNftOfferCache,
       fungibleOfferCache: this.state.fungibleOfferCache,
-      setFungibleOfferCache: this.setFungibleOfferCache
+      setFungibleOfferCache: this.setFungibleOfferCache,
+      getFungibleOfferCache: this.getFungibleOfferCache
     }
 
     return (
@@ -309,6 +311,10 @@ class App extends React.Component {
     this.setState({ fungibleOfferCache: newCache })
 
     // console.log('Setting fungibleOfferCache: ', this.state.fungibleOfferCache)
+  }
+
+  getFungibleOfferCache () {
+    return this.state.fungibleOfferCache
   }
 }
 

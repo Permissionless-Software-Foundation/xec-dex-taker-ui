@@ -14,7 +14,7 @@ const TABLE_HEADERS = [
     isFilterable: true
   },
   {
-    prop: 'tokenId',
+    prop: 'tokenIdLink',
     title: 'Token ID'
   },
   {
@@ -22,7 +22,7 @@ const TABLE_HEADERS = [
     title: 'Type'
   },
   {
-    prop: 'p2wdbHash',
+    prop: 'p2wdbHashLink',
     title: 'P2WDB ID'
   },
   {

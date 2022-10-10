@@ -345,6 +345,7 @@ class NFTs extends React.Component {
     return tokenCards
   }
 
+  // Lazy load the token icons using the auto-retry queue.
   async lazyLoadTokenIcons3 () {
     const offers = this.state.offers
     // console.log(`lazy loading these tokens: ${JSON.stringify(tokens, null, 2)}`)
@@ -376,7 +377,10 @@ class NFTs extends React.Component {
     if (!offer.iconDownloaded) {
       console.log(`Updating token icon for token ID ${offer.tokenId}`)
 
-      if (offer.tokenData.optimizedTokenIcon) {
+      // Test if token icon is compatible with one of the specs.
+      const specCompat = offer.tokenData.iconRepoCompatible || offer.tokenData.ps002Compatible
+
+      if (offer.tokenData.optimizedTokenIcon && specCompat) {
         // Use the optimized token icon URL if it is available.
 
         const newIcon = (
@@ -386,7 +390,7 @@ class NFTs extends React.Component {
         // Add the JSX for the icon to the token object.
         offer.icon = newIcon
         // thisOffer.mutableData = mutableData
-      } else if (offer.tokenData.tokenIcon) {
+      } else if (offer.tokenData.tokenIcon && specCompat) {
         // If the optimized token icon URL is not available, try to use the
         // original token icon URL.
 

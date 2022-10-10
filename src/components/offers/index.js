@@ -5,9 +5,9 @@
 
 // Global npm libraries
 import React from 'react'
-import { Button } from 'react-bootstrap'
+import { Button, Image } from 'react-bootstrap'
 import axios from 'axios'
-// import { DatatableWrapper, TableBody, TableHeader } from 'react-bs-datatable'
+import RetryQueue from '@chris.troutner/retry-queue'
 
 // Local libraries
 import config from '../../config'
@@ -39,12 +39,23 @@ class Offers extends React.Component {
 
       // Pass state from App.js parent to this child component.
       fungibleOfferCache: props.appData.fungibleOfferCache,
-      setFungibleOfferCache: props.appData.setFungibleOfferCache
+      setFungibleOfferCache: props.appData.setFungibleOfferCache,
+      getFungibleOfferCache: props.appData.getFungibleOfferCache
     }
+
+    // Encapsulate dependencies
+    this.retryQueue = new RetryQueue({
+      concurrency: 5,
+      attempts: 2,
+      retryPeriod: 2000
+    })
 
     // Bind 'this' object to functions below.
     this.handleBuy = this.handleBuy.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
+    this.lazyLoadTokenIcons = this.lazyLoadTokenIcons.bind(this)
+    this.getTokenDataWrapper = this.getTokenDataWrapper.bind(this)
+    this.tokenDownloadedCB = this.tokenDownloadedCB.bind(this)
 
     // Encapsulate dependencies
     this.verify = new VerifiedTokens()
@@ -53,6 +64,7 @@ class Offers extends React.Component {
   }
 
   render () {
+    // console.log('Rendering Fungible Offers View')
     // console.log(`Rendering with this offer data: ${JSON.stringify(this.state.offers, null, 2)}`)
 
     const heading = 'Generating Counter Offer...'
@@ -88,7 +100,7 @@ class Offers extends React.Component {
     }, 30000)
   }
 
-  // Get Offer data and manipulate it for the sake of presentation.
+  // Get Offer data from bch-dex and manipulate it for the sake of presentation.
   async handleOffers () {
     // Get raw offer data.
     let offerRawData = await this.getOffers()
@@ -97,6 +109,8 @@ class Offers extends React.Component {
 
     if (cachedOfferFound) {
       offerRawData = hydratedOffers
+    } else {
+      console.log('cached offer not found')
     }
 
     // Clone the offerRawData array
@@ -119,7 +133,7 @@ class Offers extends React.Component {
       // Get and format the token ID
       const tokenId = thisOffer.tokenId
       const smallTokenId = this.cutString(tokenId)
-      thisOffer.tokenId = (<a href={`https://token.fullstack.cash/?tokenid=${tokenId}`} target='_blank' rel='noreferrer'>{smallTokenId}</a>)
+      thisOffer.tokenIdLink = (<a href={`https://token.fullstack.cash/?tokenid=${tokenId}`} target='_blank' rel='noreferrer'>{smallTokenId}</a>)
 
       // Get and format the P2WDB ID
       const p2wdbHash = thisOffer.p2wdbHash
@@ -127,9 +141,11 @@ class Offers extends React.Component {
 
       thisOffer.button = (<Button text='Buy' variant='success' size='sm' id={p2wdbHash} onClick={this.handleBuy}>Buy</Button>)
 
-      thisOffer.p2wdbHash = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
+      thisOffer.p2wdbHashLink = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
 
       // console.log('this.state.appData: ', this.state.appData)
+
+      // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
       // Convert sats to BCH, and then calculate cost in USD.
       const bchjs = this.state.appData.bchWallet.bchjs
@@ -138,7 +154,7 @@ class Offers extends React.Component {
       const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
       // console.log('bchCost: ', bchCost)
       // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
-      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice
+      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
       // console.log('usdPrice: ', usdPrice)
       const priceStr = `$${usdPrice.toFixed(3)}`
       thisOffer.usdPrice = priceStr
@@ -148,6 +164,8 @@ class Offers extends React.Component {
       // Signal that this offer has been hydrated with initial data.
       thisOffer.initHydrated = true
 
+      thisOffer.iconDownloaded = false
+
       offers.push(thisOffer)
     }
 
@@ -155,6 +173,104 @@ class Offers extends React.Component {
       offers
     })
     // console.log('offers: ', offers)
+
+    // Kick off a lazy load of the token icons.
+    this.lazyLoadTokenIcons()
+  }
+
+  lazyLoadTokenIcons () {
+    const offers = this.state.offers
+
+    for (let i = 0; i < offers.length; i++) {
+      const thisOffer = offers[i]
+      // console.log('lazyLoadTokenIcons() thisOffer: ', thisOffer)
+
+      // Get token data if it hasn't already been downloaded.
+      const tokenData = thisOffer.tokenData
+      if (!tokenData) {
+        // Prepare the object to pass to the queue.
+        const inObj = {
+          offer: thisOffer,
+          callback: this.tokenDownloadedCB
+        }
+
+        // Kick off async token icon download. This function is not 'awaited'
+        // as it should not block execution.
+        this.retryQueue.addToQueue(this.getTokenDataWrapper, inObj)
+      }
+    }
+  }
+
+  // This function wraps the bch-dex-lib getTokenData() function in a promise-based
+  // function with an object input, so that it can be called by the retry-queue.
+  async getTokenDataWrapper (inObj) {
+    const { offer, callback } = inObj
+
+    await this.state.appData.dex.tokenData.getTokenData(offer, callback)
+  }
+
+  // This function is called once the token data has finished downloading.
+  // It updates the state of the app, to render the token icon.
+  tokenDownloadedCB (offer) {
+    // console.log('tokenDownloadedCB() offer: ', offer)
+
+    if (!offer.iconDownloaded) {
+      // console.log(`Updating token icon for token ID ${offer.tokenId}`)
+
+      // Test if token icon is compatible with one of the specs.
+      const specCompat = offer.tokenData.iconRepoCompatible || offer.tokenData.ps002Compatible
+
+      if (offer.tokenData.optimizedTokenIcon && specCompat) {
+        // Use the optimized token icon URL if it is available.
+
+        const currentTicker = offer.ticker
+
+        const newIcon = (
+          <div>
+            <Image thumbnail src={offer.tokenData.optimizedTokenIcon} style={{ maxWidth: '75px' }} />
+            <p>{currentTicker}</p>
+          </div>
+        )
+
+        // Add the JSX for the icon to the token object.
+        offer.ticker = newIcon
+        // thisOffer.mutableData = mutableData
+      } else if (offer.tokenData.tokenIcon && specCompat) {
+        // If the optimized token icon URL is not available, try to use the
+        // original token icon URL.
+
+        const currentTicker = offer.ticker
+
+        const newIcon = (
+          <div>
+            <Image src={offer.tokenData.tokenIcon} style={{ maxWidth: '75px' }} />
+            <p>{currentTicker}</p>
+          </div>
+        )
+
+        // Add the JSX for the icon to the token object.
+        offer.ticker = newIcon
+        // thisOffer.mutableData = mutableData
+      }
+
+      // If neither token icon URL is available, default to the JDenticon.
+
+      offer.iconDownloaded = true
+
+      // Replace the offer in the offers array.
+      const offers = this.state.offers
+      const offerIndex = offers.findIndex(x => x.p2wdbHash === offer.p2wdbHash)
+      if (offerIndex) {
+        offers[offerIndex] = offer
+      }
+
+      // Trigger a render with the new token icon.
+      this.setState({ offers })
+
+      // Update the offer cache stored by the parent component.
+      // console.log('Adding offers to offer cache')
+      this.state.setFungibleOfferCache(offers)
+    }
   }
 
   // This function expects an array of offers as input. Each offer is uniquely
@@ -166,8 +282,9 @@ class Offers extends React.Component {
     if (!Array.isArray(offers)) { throw new Error('offers must be an array of Offer objects.') }
 
     let cachedOfferFound = false
-    const fungibleOfferCache = this.state.fungibleOfferCache
-    // console.log('hydrateOffersFromCache() offerCache: ', offerCache)
+    // const fungibleOfferCache = this.state.fungibleOfferCache
+    const fungibleOfferCache = this.state.getFungibleOfferCache()
+    // console.log('hydrateOffersFromCache() fungibleOfferCache: ', fungibleOfferCache)
 
     for (let i = 0; i < offers.length; i++) {
       const thisOffer = offers[i]

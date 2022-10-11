@@ -27,7 +27,7 @@ class NFTs extends React.Component {
       offers: [],
       iconsAreLoaded: false,
       reloadInterval: null,
-      page: 0,
+      page: 1,
 
       // Pass state from App.js parent to this child component.
       nftOfferCache: props.appData.nftOfferCache,
@@ -54,15 +54,7 @@ class NFTs extends React.Component {
     // Retrieve initial offer data
     await this.handleOffers()
 
-    // const oldInterval = this.state.reloadInterval
-    // clearInterval(oldInterval)
-
-    // Get data and update the table periodically.
-    // const reloadInterval = setInterval(async () => {
-    //   await this.handleOffers()
-    // }, 30000)
-    // this.setState({ reloadInterval })
-
+    // This interval checks to see if all token icons have been downloaded.
     this.tokenIconDownloadInterval = setInterval(() => {
       this.checkIfIconsAreDownloaded()
     }, 2000)
@@ -139,11 +131,10 @@ class NFTs extends React.Component {
     )
   }
 
+  // Click handler for the 'Load More' button at the bottom of the UI.
   async handleNextPage (event) {
     console.log('nextPage() called.')
     let nextPage = this.state.page
-    nextPage++
-    console.log(`nextPage: ${nextPage}`)
 
     // const existingOffers = this.state.offers
     // console.log('existingOffers: ', existingOffers)
@@ -154,17 +145,32 @@ class NFTs extends React.Component {
     // Exit if there are no new offers.
     if (!newOffers.length) return
 
+    // Only increment the page count if the current page returns full results.
+    if (newOffers.length >= 6) {
+      nextPage++
+    }
+    console.log(`nextPage: ${nextPage}`)
+
     const offers = this.combineOffers(newOffers)
     // console.log('handleNextPage combined offers: ', offers)
 
-    this.setState({
+    await this.setState({
       offers,
-      page: nextPage
+      page: nextPage,
+      iconsAreLoaded: false
     })
+
+    // This interval checks to see if all token icons have been downloaded.
+    this.tokenIconDownloadInterval = setInterval(() => {
+      this.checkIfIconsAreDownloaded()
+    }, 2000)
 
     this.lazyLoadTokenIcons3()
   }
 
+  // This function gets a page of Offer objects. It kicks off a lazy-load
+  // non-blocking event stream for downloading token icons. Caches are used to
+  // reduce the number of API calls.
   async handleOffers () {
     try {
       let offers = await this.getNftOffers()
@@ -313,7 +319,7 @@ class NFTs extends React.Component {
       unseenOffers.push(thisOffer)
     }
 
-    // console.log('unseenOffers: ', unseenOffers)
+    console.log('unseenOffers: ', unseenOffers)
 
     const combinedOffers = existingOffers.concat(unseenOffers)
 

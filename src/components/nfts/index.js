@@ -31,7 +31,8 @@ class NFTs extends React.Component {
 
       // Pass state from App.js parent to this child component.
       nftOfferCache: props.appData.nftOfferCache,
-      setNftOfferCache: props.appData.setNftOfferCache
+      setNftOfferCache: props.appData.setNftOfferCache,
+      getNftOfferCache: props.appData.getNftOfferCache
     }
 
     // Encapsulate dependencies
@@ -47,10 +48,20 @@ class NFTs extends React.Component {
     this.getTokenDataWrapper = this.getTokenDataWrapper.bind(this)
     this.tokenDownloadedCB = this.tokenDownloadedCB.bind(this)
     this.checkIfIconsAreDownloaded = this.checkIfIconsAreDownloaded.bind(this)
+    this.handleStartProcessingTokens = this.handleStartProcessingTokens.bind(this)
   }
 
   // Executes when the component mounts.
   async componentDidMount () {
+    await this.handleStartProcessingTokens()
+  }
+
+  async handleStartProcessingTokens () {
+    await this.setState({
+      iconsAreLoaded: false,
+      page: 1
+    })
+
     // Retrieve initial offer data
     await this.handleOffers()
 
@@ -96,7 +107,7 @@ class NFTs extends React.Component {
         <Container>
           <Row>
             <Col xs={6}>
-              <Button variant='success' onClick={this.handleOffers}>
+              <Button variant='success' onClick={this.handleStartProcessingTokens}>
                 <FontAwesomeIcon icon={faRedo} size='lg' /> Refresh
               </Button>
             </Col>
@@ -177,6 +188,8 @@ class NFTs extends React.Component {
       console.log('offers: ', offers)
 
       const { hydratedOffers, cachedOfferFound } = this.hydrateOffersFromCache(offers)
+      console.log('cachedOfferFound: ', cachedOfferFound)
+      console.log('hydratedOffers.length: ', hydratedOffers.length)
 
       if (cachedOfferFound) {
         offers = hydratedOffers
@@ -202,8 +215,8 @@ class NFTs extends React.Component {
     if (!Array.isArray(offers)) { throw new Error('offers must be an array of Offer objects.') }
 
     let cachedOfferFound = false
-    const nftOfferCache = this.state.nftOfferCache
-    // console.log('hydrateOffersFromCache() offerCache: ', offerCache)
+    const nftOfferCache = this.state.getNftOfferCache()
+    console.log('hydrateOffersFromCache() nftOfferCache: ', nftOfferCache)
 
     for (let i = 0; i < offers.length; i++) {
       const thisOffer = offers[i]
@@ -306,13 +319,13 @@ class NFTs extends React.Component {
         // Convert sats to BCH, and then calculate cost in USD.
         const bchjs = this.state.appData.bchWallet.bchjs
         const rateInSats = parseInt(thisOffer.rateInBaseUnit)
-        // console.log('rateInSats: ', rateInSats)
+        console.log('rateInSats: ', rateInSats)
         const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
-        // console.log('bchCost: ', bchCost)
-        // console.log('bchUsdPrice: ', this.state.appData.bchUsdPrice)
-        let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
-        usdPrice = bchjs.Util.floor2(usdPrice)
-        const priceStr = `$${usdPrice.toFixed(2)}`
+        console.log('bchCost: ', bchCost)
+        console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+        let usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice
+        usdPrice = bchjs.Util.floor8(usdPrice)
+        const priceStr = `$${usdPrice.toFixed(3)}`
         thisOffer.usdPrice = priceStr
       }
 

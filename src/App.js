@@ -98,6 +98,7 @@ class App extends React.Component {
     this.passMnemonic = this.passMnemonic.bind(this)
     this.onModalClose = this.onModalClose.bind(this)
     this.setNftOfferCache = this.setNftOfferCache.bind(this)
+    this.getNftOfferCache = this.getNftOfferCache.bind(this)
     this.setFungibleOfferCache = this.setFungibleOfferCache.bind(this)
     this.getFungibleOfferCache = this.getFungibleOfferCache.bind(this)
 
@@ -206,6 +207,7 @@ class App extends React.Component {
       // Offer caches
       nftOfferCache: this.state.nftOfferCache,
       setNftOfferCache: this.setNftOfferCache,
+      getNftOfferCache: this.getNftOfferCache,
       fungibleOfferCache: this.state.fungibleOfferCache,
       setFungibleOfferCache: this.setFungibleOfferCache,
       getFungibleOfferCache: this.getFungibleOfferCache
@@ -315,6 +317,10 @@ class App extends React.Component {
 
   getFungibleOfferCache () {
     return this.state.fungibleOfferCache
+  }
+
+  getNftOfferCache () {
+    return this.state.nftOfferCache
   }
 }
 

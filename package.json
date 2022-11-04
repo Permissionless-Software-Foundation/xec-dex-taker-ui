@@ -1,5 +1,5 @@
 {
-  "name": "bch-dex-taker-ui",
+  "name": "xec-dex-taker-ui",
   "version": "1.0.0",
   "dependencies": {
     "@chris.troutner/react-jdenticon": "1.0.0",
@@ -9,9 +9,7 @@
     "@fortawesome/free-solid-svg-icons": "6.1.2",
     "@fortawesome/react-fontawesome": "0.2.0",
     "axios": "0.27.2",
-    "bch-dex-lib": "1.4.1",
     "bch-message-lib": "2.2.1",
-    "bch-token-sweep": "2.1.2",
     "bootstrap": "5.2.0",
     "p2wdb": "2.2.3",
     "qrcode.react": "3.1.0",
@@ -22,7 +20,9 @@
     "react-dom": "18.2.0",
     "react-scripts": "5.0.1",
     "use-local-storage-state": "18.1.0",
-    "use-query-params": "1.2.3"
+    "use-query-params": "1.2.3",
+    "xec-dex-lib": "1.0.0",
+    "xec-token-sweep": "1.0.4"
   },
   "scripts": {
     "start": "react-scripts start",

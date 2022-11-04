@@ -1,0 +1,6 @@
+{
+	"appId": "com.slp_dex.app",
+	"appName": "SLP DEX",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}

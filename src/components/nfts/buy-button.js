@@ -90,7 +90,7 @@ class BuyNftButton extends React.Component {
       // Add link to output
       const modalBody = []
       modalBody.push('Success!')
-      modalBody.push(<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
+      modalBody.push(<a href={`https://xec-p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
       modalBody.push('What happens next:')
       modalBody.push('The money has not yet left your wallet! It is still under your control.')
       modalBody.push('If the sellers node is online, they will accept the Counter Offer you just generated in a few minutes.')

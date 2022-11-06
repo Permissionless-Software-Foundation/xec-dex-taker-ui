@@ -27,12 +27,12 @@ class ReceiveCard extends React.Component {
 
   render () {
     // Determine which address to display
-    let addrToDisplay = this.state.appData.bchWalletState.cashAddress
+    let addrToDisplay = this.state.appData.bchWalletState.eCashAddress
     const addrSwitch = this.state.addrSwitch
     if (!addrSwitch) {
-      addrToDisplay = this.state.appData.bchWalletState.cashAddress
+      addrToDisplay = this.state.appData.bchWalletState.eCashAddress
     } else {
-      addrToDisplay = this.state.appData.bchWalletState.slpAddress
+      addrToDisplay = this.state.appData.bchWalletState.eTokenAddress
     }
 
     return (
@@ -94,12 +94,12 @@ class ReceiveCard extends React.Component {
     // console.log('QR code clicked')
 
     // Determine which address to display
-    let addrToDisplay = _this.state.appData.bchWalletState.cashAddress
+    let addrToDisplay = _this.state.appData.bchWalletState.eCashAddress
     const addrSwitch = _this.state.addrSwitch
     if (!addrSwitch) {
-      addrToDisplay = _this.state.appData.bchWalletState.cashAddress
+      addrToDisplay = _this.state.appData.bchWalletState.eCashAddress
     } else {
-      addrToDisplay = _this.state.appData.bchWalletState.slpAddress
+      addrToDisplay = _this.state.appData.bchWalletState.eTokenAddress
     }
 
     try {

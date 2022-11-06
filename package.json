@@ -21,7 +21,7 @@
     "react-scripts": "5.0.1",
     "use-local-storage-state": "18.1.0",
     "use-query-params": "1.2.3",
-    "xec-dex-lib": "1.0.0",
+    "xec-dex-lib": "1.0.1",
     "xec-token-sweep": "1.0.4"
   },
   "scripts": {

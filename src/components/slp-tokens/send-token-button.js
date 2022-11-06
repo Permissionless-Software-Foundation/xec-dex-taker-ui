@@ -21,6 +21,7 @@ class SentTokenButton extends React.Component {
     this.state = {
       token: props.token,
       appData: props.appData,
+      showAddrWarning: false,
 
       // Function from parent View component. Called after sending tokens,
       // to trigger a refresh of the wallet token balances.
@@ -39,7 +40,8 @@ class SentTokenButton extends React.Component {
       dialogFinished: true
     }
 
-    // _this = this
+    // Bind 'this' object to subfunctions.
+    this.handleUpdateSendToAddr = this.handleUpdateSendToAddr.bind(this)
   }
 
   render () {
@@ -121,8 +123,8 @@ class SentTokenButton extends React.Component {
                   <Form.Group controlId='formBasicEmail' style={{ textAlign: 'center' }}>
                     <Form.Control
                       type='text'
-                      placeholder='simpleledger:qqlrzp23w08434twmvr4fxw672whkjy0pyxpgpyg0n'
-                      onChange={e => this.setState({ sendToAddress: e.target.value })}
+                      placeholder='etoken:qz8zzt9pp95pzsgqtstq0dsvmnssdydjy5mvzyjjln'
+                      onChange={this.handleUpdateSendToAddr}
                       value={this.state.sendToAddress}
                     />
                   </Form.Group>
@@ -171,6 +173,27 @@ class SentTokenButton extends React.Component {
             </Row>
             <br />
 
+            {
+              this.state.showAddrWarning
+                ? (
+                  <>
+                    <Row>
+                      <Col style={{ textAlign: 'center' }}>
+                        <p style={{ color: 'orange' }}>
+                          <b>Warning</b>: Careful! Not all eCash wallets are token-aware.
+                          If you send this token to a wallet that is not
+                          token-aware, it could be burned. It's best practice to
+                          only send tokens to 'etoken:' addresses and not
+                          'ecash:' addresses.
+                        </p>
+                      </Col>
+                    </Row>
+                    <br />
+                  </>
+                  )
+                : null
+            }
+
             <Row>
               <Col xs={10}>
                 {this.state.statusMsg}
@@ -186,6 +209,19 @@ class SentTokenButton extends React.Component {
         <Modal.Footer />
       </Modal>
     )
+  }
+
+  handleUpdateSendToAddr (event) {
+    // onChange={e => this.setState({ sendToAddress: e.target.value })}
+    const value = event.target.value
+
+    this.setState({ sendToAddress: value })
+
+    if (value.includes('ecash')) {
+      this.setState({ showAddrWarning: true })
+    } else {
+      this.setState({ showAddrWarning: false })
+    }
   }
 
   // This handler is called when the user clicks on the paste-icon favicon,
@@ -227,7 +263,8 @@ class SentTokenButton extends React.Component {
       instance.setState({
         statusMsg: 'Preparing to send tokens...',
         hideSpinner: false,
-        dialogFinished: false
+        dialogFinished: false,
+        showAddrWarning: false
       })
 
       // Validate the quantity
@@ -243,8 +280,12 @@ class SentTokenButton extends React.Component {
       if (addr.includes('simpleledger')) {
         // Convert the address to a cash address.
         addr = bchjs.SLP.Address.toCashAddress(addr)
+
+        addr = bchjs.Address.toEcashAddress(addr)
+      } else if (addr.includes('bitcoincash') || addr.includes('etoken')) {
+        addr = bchjs.Address.toEcashAddress(addr)
       }
-      if (!addr.includes('bitcoincash')) throw new Error('Invalid address')
+      if (!addr.includes('ecash')) throw new Error('Invalid address')
 
       // Update the wallets UTXOs
       let infoStr = 'Updating UTXOs...'
@@ -257,6 +298,7 @@ class SentTokenButton extends React.Component {
         tokenId: instance.state.token.tokenId,
         qty
       }]
+      console.log(`receiver: ${JSON.stringify(receiver, null, 2)}`)
 
       // Send the tokens
       infoStr = 'Generating and broadcasting transaction...'
@@ -267,7 +309,7 @@ class SentTokenButton extends React.Component {
       console.log(`Token sent. TXID: ${txid}`)
 
       instance.setState({
-        statusMsg: (<p>Success! <a href={`https://token.fullstack.cash/transactions/?txid=${txid}`} target='_blank' rel='noreferrer'>See on Block Explorer</a></p>),
+        statusMsg: (<p>Success! <a href={`https://explorer.be.cash/tx/${txid}`} target='_blank' rel='noreferrer'>See on Block Explorer</a></p>),
         hideSpinner: true,
         sendQtyStr: '',
         sendToAddress: '',

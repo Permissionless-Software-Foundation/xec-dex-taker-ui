@@ -19,8 +19,8 @@ class AsyncLoad {
   // attached to the global 'window' object.
   async loadWalletLib () {
     do {
-      if (typeof window !== 'undefined' && window.SlpWallet) {
-        this.BchWallet = window.SlpWallet
+      if (typeof window !== 'undefined' && window.XecWallet) {
+        this.BchWallet = window.XecWallet
 
         return this.BchWallet
       } else {
@@ -47,7 +47,7 @@ class AsyncLoad {
   //   } while (!this.Sweep)
   // }
   //
-  // // Load the bch-dex-lib which comes in a <script> file and is attached to
+  // // Load the xec-dex-lib which comes in a <script> file and is attached to
   // // the global 'window' object.
   // async loadBchDexLib () {
   //   do {
@@ -56,14 +56,14 @@ class AsyncLoad {
   //
   //       return this.BchDexLib
   //     } else {
-  //       console.log('Waiting for bch-dex-lib library to load...')
+  //       console.log('Waiting for xec-dex-lib library to load...')
   //     }
   //
   //     await sleep(1000)
   //   } while (!this.BchDexLib)
   // }
   //
-  // // Load the bch-dex-lib which comes in a <script> file and is attached to
+  // // Load the xec-dex-lib which comes in a <script> file and is attached to
   // // the global 'window' object.
   // async loadP2wdbLib () {
   //   do {
@@ -211,10 +211,7 @@ class AsyncLoad {
       console.log('Returning hard-coded list of servers.')
 
       const defaultOptions = [
-        { value: 'https://free-bch.fullstack.cash', label: 'https://free-bch.fullstack.cash' },
-        { value: 'https://bc01-ca-bch-consumer.fullstackcash.nl', label: 'https://bc01-ca-bch-consumer.fullstackcash.nl' },
-        { value: 'https://pdx01-usa-bch-consumer.fullstackcash.nl', label: 'https://pdx01-usa-bch-consumer.fullstackcash.nl' },
-        { value: 'https://wa-usa-bch-consumer.fullstackcash.nl', label: 'https://wa-usa-bch-consumer.fullstackcash.nl' }
+        { value: 'https://wa-usa-xec-consumer.fullstackcash.nl', label: 'https://wa-usa-xec-consumer.fullstackcash.nl' }
       ]
 
       return defaultOptions

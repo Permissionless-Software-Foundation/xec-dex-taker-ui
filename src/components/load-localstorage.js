@@ -7,7 +7,7 @@
 import useLocalStorageState from 'use-local-storage-state'
 
 function LoadLocalStorage (props) {
-  const [lsState, setLSState, { removeItem }] = useLocalStorageState('bchWalletState', {
+  const [lsState, setLSState, { removeItem }] = useLocalStorageState('xecDexTakerWalletState', {
     ssr: true,
     defaultValue: {}
   })

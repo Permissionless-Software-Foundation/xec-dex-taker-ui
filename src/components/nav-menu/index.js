@@ -27,7 +27,7 @@ class NavMenu extends React.Component {
         <Navbar collapseOnSelect expand='xxxl' bg='dark' variant='dark' style={{ paddingRight: '20px' }}>
           <Navbar.Brand href='#home' style={{ paddingLeft: '20px' }}>
             <Image src={Logo} thumbnail width='50' />{' '}
-            BCH DEX - Buyer Wallet
+            XEC DEX - Buyer Wallet
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls='responsive-navbar-nav' />
@@ -35,8 +35,8 @@ class NavMenu extends React.Component {
             <Nav className='mr-auto' style={{ padding: '25px' }}>
               <Nav.Link href='#' onClick={() => this.handleClickEvent(0)}>NFTs</Nav.Link>
               <Nav.Link href='#' onClick={() => this.handleClickEvent(1)}>Fungible Tokens</Nav.Link>
-              <Nav.Link href='#' onClick={() => this.handleClickEvent(2)}>BCH</Nav.Link>
-              <Nav.Link href='#' onClick={() => this.handleClickEvent(3)}>Tokens</Nav.Link>
+              <Nav.Link href='#' onClick={() => this.handleClickEvent(2)}>eCash</Nav.Link>
+              <Nav.Link href='#' onClick={() => this.handleClickEvent(3)}>eTokens</Nav.Link>
               <Nav.Link href='#' onClick={() => this.handleClickEvent(4)}>Sweep</Nav.Link>
               <Nav.Link href='#' onClick={() => this.handleClickEvent(5)}>Wallet</Nav.Link>
             </Nav>

@@ -31,7 +31,7 @@ class WebWalletWarning extends React.Component {
 
                   <Card.Text style={{ textAlign: 'center' }}>
                     This is an open source, non-custodial web wallet
-                    supporting Bitcoin Cash (BCH) and SLP tokens.
+                    supporting eCash (XEC) and SLP tokens (eTokens).
                     It is optimized for convenience and not security.
                     <br />
                     <b>Do not store large amounts of money on a web wallet.

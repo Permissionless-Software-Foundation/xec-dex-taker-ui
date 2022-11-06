@@ -33,7 +33,7 @@ class SendCard extends React.Component {
       amountBch: 0, // on-the-fly calculated BCH amount.
 
       // Used to display the opposite units and quantity.
-      oppositeUnits: 'BCH',
+      oppositeUnits: 'eCash',
       oppositeQty: 0,
 
       // Modal variables
@@ -63,7 +63,7 @@ class SendCard extends React.Component {
           this.state.hideModal
             ? null
             : (<ModalTemplate
-                heading='Sending BCH'
+                heading='Sending eCash'
                 body={this.state.modalBody}
                 hideSpinner={this.state.hideModalSpinner}
                 closeFunc={this.onModalClose}
@@ -82,7 +82,7 @@ class SendCard extends React.Component {
             <Container>
               <Row>
                 <Col style={{ textAlign: 'center' }}>
-                  <b>BCH Address:</b>
+                  <b>eCash Address:</b>
                 </Col>
               </Row>
 
@@ -90,7 +90,7 @@ class SendCard extends React.Component {
                 <Col xs={10}>
                   <Form>
                     <Form.Group controlId='formBasicEmail' style={{ textAlign: 'center' }}>
-                      <Form.Control type='text' placeholder='bitcoincash:qqlrzp23w08434twmvr4fxw672whkjy0py26r63g3d' onChange={e => this.setState({ bchAddr: e.target.value })} value={this.state.bchAddr} />
+                      <Form.Control type='text' placeholder='ecash:qz8zzt9pp95pzsgqtstq0dsvmnssdydjy54jtxy4my' onChange={e => this.setState({ bchAddr: e.target.value })} value={this.state.bchAddr} />
                     </Form.Group>
                   </Form>
                 </Col>
@@ -185,14 +185,18 @@ class SendCard extends React.Component {
       const currentUnit = _this.state.amountUnits
       if (currentUnit.includes('USD')) {
         // Convert USD to BCH
-        oppositeQty = bchjs.Util.floor8(amountQty / bchUsdPrice)
+        oppositeQty = bchjs.Util.floor2(amountQty / bchUsdPrice)
         amountUsd = amountQty
         amountBch = oppositeQty
+
+        console.log(`oppositeQty: ${oppositeQty}, amountUsd: ${amountUsd}, amountBch: ${amountBch}`)
       } else {
         // Convert BCH to USD
         oppositeQty = bchjs.Util.floor2(amountQty * bchUsdPrice)
         amountUsd = oppositeQty
         amountBch = amountQty
+
+        console.log(`oppositeQty: ${oppositeQty}, amountUsd: ${amountUsd}, amountBch: ${amountBch}`)
       }
 
       _this.setState({
@@ -214,11 +218,11 @@ class SendCard extends React.Component {
     let oppositeUnits = ''
     const oldUnit = _this.state.amountUnits
     if (oldUnit.includes('USD')) {
-      newUnit = 'BCH'
+      newUnit = 'XEC'
       oppositeUnits = 'USD'
     } else {
       newUnit = 'USD'
-      oppositeUnits = 'BCH'
+      oppositeUnits = 'XEC'
     }
 
     // Clear the Amount text box
@@ -236,7 +240,7 @@ class SendCard extends React.Component {
   // Send BCH based to the address in the form, and the amount specified in the
   // form.
   async handleSendBch () {
-    console.log('Sending BCH')
+    console.log('Sending XEC')
 
     try {
       // Clear the modal body
@@ -247,7 +251,7 @@ class SendCard extends React.Component {
       })
 
       // Open the modal
-      const modalBody = ['Preparing to send bch...']
+      const modalBody = ['Preparing to send xec...']
       _this.setState({
         hideModal: false,
         modalBody
@@ -258,7 +262,7 @@ class SendCard extends React.Component {
       if (amountBch < 0.00000546) throw new Error('Trying to send less than dust.')
 
       let bchAddr = _this.state.bchAddr
-      let infoStr = `Sending ${amountBch} BCH ($${_this.state.amountUsd} USD) to ${bchAddr}`
+      let infoStr = `Sending ${amountBch} XEC ($${_this.state.amountUsd} USD) to ${bchAddr}`
       console.log(infoStr)
 
       // Update modal
@@ -269,12 +273,18 @@ class SendCard extends React.Component {
       const bchjs = wallet.bchjs
 
       // If the address is an SLP address, convert it to a cash address.
-      if (!bchAddr.includes('bitcoincash:')) {
+      if (bchAddr.includes('simpeledger')) {
         bchAddr = bchjs.SLP.Address.toCashAddress(bchAddr)
       }
 
+      if (bchAddr.includes('ecash') || bchAddr.includes('etoken')) {
+        bchAddr = bchjs.Address.ecashtoCashAddress(bchAddr)
+      }
+
       // Convert the BCH to satoshis
-      const sats = bchjs.BitcoinCash.toSatoshi(amountBch)
+      // const sats = bchjs.BitcoinCash.toSatoshi(amountBch)
+      const sats = Math.ceil(amountBch * 100)
+      console.log(`sats: ${sats}`)
 
       // Update the wallets UTXOs
       infoStr = 'Updating UTXOs...'
@@ -295,7 +305,7 @@ class SendCard extends React.Component {
       modalBody.push(infoStr)
 
       // Link to block explorer
-      const explorerUrl = `https://blockchair.com/bitcoin-cash/transaction/${txid}`
+      const explorerUrl = `https://explorer.be.cash/tx/${txid}`
       const explorerLink = (<a href={`${explorerUrl}`} target='_blank' rel='noreferrer'>Block Explorer</a>)
       modalBody.push(explorerLink)
 

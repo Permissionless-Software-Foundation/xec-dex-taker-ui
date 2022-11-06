@@ -441,7 +441,7 @@ class NFTs extends React.Component {
     }
   }
 
-  // This function wraps the bch-dex-lib getTokenData() function in a promise-based
+  // This function wraps the xec-dex-lib getTokenData() function in a promise-based
   // function with an object input, so that it can be called by the retry-queue.
   async getTokenDataWrapper (inObj) {
     const { offer, callback } = inObj

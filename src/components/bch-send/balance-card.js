@@ -24,8 +24,11 @@ class BalanceCard extends React.Component {
 
     const bchjs = this.state.appData.bchWallet.bchjs
     const sats = this.state.appData.bchWalletState.bchBalance
+    const eCashBalance = sats / 100
     const bchBalance = bchjs.BitcoinCash.toBitcoinCash(sats)
-    const usdBalance = bchjs.Util.floor2(bchBalance * this.state.appData.bchWalletState.bchUsdPrice)
+    const usdBalance = bchjs.Util.floor2(eCashBalance * this.state.appData.bchWalletState.bchUsdPrice)
+    console.log('this.state.appData.bchWalletState.bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+    console.log('usdBalance: ', usdBalance)
 
     return (
       <>
@@ -45,13 +48,19 @@ class BalanceCard extends React.Component {
 
               <Row>
                 <Col>
-                  <b>BCH</b>: {bchBalance}
+                  <b>eCash</b>: {eCashBalance}
                 </Col>
               </Row>
 
               <Row>
                 <Col>
                   <b>Satoshis</b>: {sats}
+                </Col>
+              </Row>
+
+              <Row>
+                <Col>
+                  <b>Bitcoin</b>: {bchBalance}
                 </Col>
               </Row>
             </Container>

@@ -141,7 +141,7 @@ class Offers extends React.Component {
 
       thisOffer.button = (<Button text='Buy' variant='success' size='sm' id={p2wdbHash} onClick={this.handleBuy}>Buy</Button>)
 
-      thisOffer.p2wdbHashLink = (<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
+      thisOffer.p2wdbHashLink = (<a href={`https://xec-p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>{smallP2wdbHash}</a>)
 
       // console.log('this.state.appData: ', this.state.appData)
 
@@ -201,7 +201,7 @@ class Offers extends React.Component {
     }
   }
 
-  // This function wraps the bch-dex-lib getTokenData() function in a promise-based
+  // This function wraps the xec-dex-lib getTokenData() function in a promise-based
   // function with an object input, so that it can be called by the retry-queue.
   async getTokenDataWrapper (inObj) {
     const { offer, callback } = inObj
@@ -335,7 +335,7 @@ class Offers extends React.Component {
       // Add link to output
       const modalBody = []
       modalBody.push('Success!')
-      modalBody.push(<a href={`https://p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
+      modalBody.push(<a href={`https://xec-p2wdb.fullstack.cash/entry/hash/${p2wdbHash}`} target='_blank' rel='noreferrer'>P2WDB Entry</a>)
       modalBody.push('What happens next:')
       modalBody.push('The money has not yet left your wallet! It is still under your control.')
       modalBody.push('If the sellers node is online, they will accept the Counter Offer you just generated in a few minutes.')

@@ -8,7 +8,7 @@ import React from 'react'
 import { Container, Row, Col, Form, Button, Modal, Spinner } from 'react-bootstrap'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCircleQuestion } from '@fortawesome/free-solid-svg-icons'
-import Sweep from 'bch-token-sweep'
+import Sweep from 'xec-token-sweep'
 
 // let _this
 

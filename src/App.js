@@ -146,8 +146,13 @@ class App extends React.Component {
 
       // Instantiate p2wdb library.
       // const P2WDBLib = this.state.appData.P2WDB
-      const p2wdbRead = new P2WDB.Read()
-      const p2wdbWrite = new P2WDB.Write({ bchWallet })
+      const p2wdbRead = new P2WDB.Read({
+        serverURL: 'https://xec-p2wdb.fullstack.cash'
+      })
+      const p2wdbWrite = new P2WDB.Write({
+        bchWallet,
+        serverURL: 'https://xec-p2wdb.fullstack.cash'
+      })
 
       // Instantiate dex library
       // const BchDexLib = this.state.appData.BchDexLib

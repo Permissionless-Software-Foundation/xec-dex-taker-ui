@@ -5,7 +5,7 @@
 // Global npm libraries
 import React from 'react'
 import { useQueryParam, StringParam } from 'use-query-params'
-import P2WDB from 'p2wdb'
+import P2WDB from 'p2wdb-esm'
 import BchDexLib from 'xec-dex-lib'
 import SweepLib from 'xec-token-sweep'
 

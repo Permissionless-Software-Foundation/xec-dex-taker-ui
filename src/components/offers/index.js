@@ -133,7 +133,7 @@ class Offers extends React.Component {
       // Get and format the token ID
       const tokenId = thisOffer.tokenId
       const smallTokenId = this.cutString(tokenId)
-      thisOffer.tokenIdLink = (<a href={`https://token.fullstack.cash/?tokenid=${tokenId}`} target='_blank' rel='noreferrer'>{smallTokenId}</a>)
+      thisOffer.tokenIdLink = (<a href={`https://etoken.fullstack.cash/?tokenid=${tokenId}`} target='_blank' rel='noreferrer'>{smallTokenId}</a>)
 
       // Get and format the P2WDB ID
       const p2wdbHash = thisOffer.p2wdbHash
@@ -147,17 +147,35 @@ class Offers extends React.Component {
 
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 
-      // Convert sats to BCH, and then calculate cost in USD.
       const bchjs = this.state.appData.bchWallet.bchjs
+
+      // Cost of token in sats
       const rateInSats = parseInt(thisOffer.rateInBaseUnit)
-      // console.log('rateInSats: ', rateInSats)
+      console.log('rateInSats: ', rateInSats)
+
+      // Cost of XEC in USD
       const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
-      // console.log('bchCost: ', bchCost)
-      // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
-      const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
-      // console.log('usdPrice: ', usdPrice)
-      const priceStr = `$${usdPrice.toFixed(3)}`
-      thisOffer.usdPrice = priceStr
+      console.log('bchCost: ', bchCost)
+
+      // Cost of XEC per sat
+      const satCost = bchCost / 100
+
+      // I'm not sure where the extra divide by 10 is coming from.
+      thisOffer.usdPrice = satCost * rateInSats / 10 * thisOffer.numTokens
+      console.log(`thisOffer.usdPrice: ${thisOffer.usdPrice}`)
+      thisOffer.usdPrice = `$${thisOffer.usdPrice.toFixed(3)}`
+
+      // Convert sats to BCH, and then calculate cost in USD.
+      // const bchjs = this.state.appData.bchWallet.bchjs
+      // const rateInSats = parseInt(thisOffer.rateInBaseUnit)
+      // // console.log('rateInSats: ', rateInSats)
+      // const bchCost = bchjs.BitcoinCash.toBitcoinCash(rateInSats)
+      // // console.log('bchCost: ', bchCost)
+      // // console.log('bchUsdPrice: ', this.state.appData.bchWalletState.bchUsdPrice)
+      // const usdPrice = bchCost * this.state.appData.bchWalletState.bchUsdPrice * thisOffer.numTokens
+      // // console.log('usdPrice: ', usdPrice)
+      // const priceStr = `$${usdPrice.toFixed(3)}`
+      // thisOffer.usdPrice = priceStr
 
       // console.log(`thisOffer: ${JSON.stringify(thisOffer, null, 2)}`)
 

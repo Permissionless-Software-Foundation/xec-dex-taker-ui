@@ -58,7 +58,7 @@ function InfoButton (props) {
             <Row>
               <Col xs={4}><b>Token ID</b>:</Col>
               <Col xs={8} style={{ wordBreak: 'break-all' }}>
-                <a href={`https://token.fullstack.cash/?tokenid=${props.token.tokenId}`} target='_blank' rel='noreferrer'>
+                <a href={`https://etoken.fullstack.cash/?tokenid=${props.token.tokenId}`} target='_blank' rel='noreferrer'>
                   {props.token.tokenId}
                 </a>
               </Col>

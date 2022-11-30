@@ -5,7 +5,7 @@
 class VerifiedTokens {
   constructor () {
     this.tetherId = '9fc89d6b7d5be2eac0b3787c5b8236bca5de641b5bafafc8f450727b63615c11'
-    this.psfId = '38e97c5d7d3585a2cbf3f9580c82ca33985f9cb0845d4dcce220cb709f9538b0'
+    this.psfId = '73fcc96ad73948a102a8cabac8fe1808f94f1a8ec5536b0f4d7c524ac63fc44a'
   }
 
   // Check the Ticker against verified Token IDs. This will return true if the
